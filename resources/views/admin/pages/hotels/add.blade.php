@@ -6,182 +6,206 @@
         <div class="card-body">
             <div class="mb-7">
                 <div class="booking-wrapper">
-                    <form method="POST" action="{{ url('/admin/hotels/add') }}" enctype="multipart/form-data" class="w-100">
-                        @csrf
+                
 
                         <div class="booking-card">
-                            <h5 class="title">Create New Hotel</h5>
-                            <p class="subtitle">Follow the steps to create a new hotel registration</p>
+                            <h5 class="title">Create New Message</h5>
+                            <p class="subtitle">Follow the steps to create a new Message</p>
 
-                            <!-- Step Progress -->
-                            <div class="step-wrapper mb-3" id="stepWrapper">
-                                <div class="step-circle active" data-step="1">1</div>
-                                <div class="step-line"></div>
-                                <div class="step-circle" data-step="2">2</div>
-                                <div class="step-line"></div>
-                                <div class="step-circle" data-step="3">3</div>
-                                <div class="step-line"></div>
-                                <div class="step-circle" data-step="4">4</div>
-                                <div class="step-line"></div>
-                                <div class="step-circle" data-step="5">5</div>
-                            </div>
 
                             <!-- STEP 1: Basic Details -->
-                            <div class="step-content" id="step1">
-                                <p class="select">Enter Basic Hotel Details</p>
-                                <div class="row g-3">
-                                    <div class="form-group col-md-6">
-                                        <input type="text" name="hotel_name" value="{{ old('hotel_name') }}"
-                                            class="form-control" placeholder="Enter Hotel Name" required>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                        <input type="text" name="hotel_address" value="{{ old('hotel_address') }}"
-                                            class="form-control" placeholder="Enter Full Address" required>
-                                    </div>
-                                    <div class="form-group col-md-12">
-                                        <textarea name="description" rows="4" class="form-control" placeholder="Enter Full Description" required>{{ old('description') }}</textarea>
-                                    </div>
-                                </div>
+                    <form action="{{ route('message.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
 
-                                <div class="action-btn mt-4 text-end">
-                                    <button type="button" class="btn btn-outline-secondary cancel-btn">Cancel</button>
-                                    <button type="button" class="btn next-btn" data-next="2">Next</button>
-                                </div>
-                            </div>
+    {{-- GLOBAL ERROR MESSAGE --}}
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            Please fix the errors below.
+        </div>
+    @endif
 
-                            <!-- STEP 2: Location Details -->
-                            <div class="step-content d-none" id="step2">
-                                <p class="select">Add Location Details</p>
-                                <div class="row g-3">
-                                    <div class="form-group col-md-6">
-                                        <select class="form-control" name="location_id" id="location_id" required>
-                                            <option value="">Select Location</option>
-                                            @foreach ($locations as $location)
-                                                <option value="{{ $location->id }}">{{ $location->city }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+    <div class="step-content" id="step1">
+        <p class="fw-bold">Create New Message</p>
+        <br>
 
-                                    <div class="form-group col-md-6">
-                                        <select class="form-control" name="locality_id" id="locality_id" required>
-                                            <option value="">Select Locality</option>
-                                        </select>
-                                    </div>
+        <div class="row g-3">
 
-                                    <div class="form-group col-md-6">
-                                        <input type="number" name="longitude" value="{{ old('longitude') }}"
-                                            class="form-control" placeholder="Longitude" step="any">
-                                    </div>
+            {{-- Media --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">Select Image / Video</label>
+                <input type="file" name="media"
+                       class="form-control @error('media') is-invalid @enderror"
+                       accept="image/*,video/*">
+                @error('media')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                                    <div class="form-group col-md-6">
-                                        <input type="number" name="latitude" value="{{ old('latitude') }}"
-                                            class="form-control" placeholder="Latitude" step="any">
-                                    </div>
+            {{-- YouTube --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">YouTube Link</label>
+                <input type="url" name="youtube_link"
+                       class="form-control @error('youtube_link') is-invalid @enderror"
+                       value="{{ old('youtube_link') }}">
+                @error('youtube_link')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                                </div>
+            {{-- Description --}}
+            <div class="form-group col-md-12">
+                <label class="fw-bold">Message Description</label>
+                <textarea name="description" rows="5"
+                          class="form-control @error('description') is-invalid @enderror"
+                          required>{{ old('description') }}</textarea>
+                @error('description')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                                <div class="d-flex justify-content-between mt-4">
-                                    <button type="button" class="btn btn-outline-secondary prev-btn"
-                                        data-prev="1">Previous</button>
-                                    <button type="button" class="btn next-btn" data-next="3">Next</button>
-                                </div>
-                            </div>
+            {{-- Calling Number --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">Calling Number</label>
+                <input type="tel" name="calling_number"
+                       class="form-control @error('calling_number') is-invalid @enderror"
+                       value="{{ old('calling_number') }}" required>
+                @error('calling_number')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                            <!-- STEP 3: Facilities -->
-                            <div class="step-content d-none" id="step3">
-                                <p class="select">Add Facility Details</p>
-                                <div class="row mt-3">
-                                    <div class="form-group col-md-7">
-                                        <label for="facility_id">Facility Name</label>
-                                        <div id="facilityCheckboxes" class="border rounded p-2"
-                                            style="max-height: 200px; overflow-y: auto;">
-                                            @foreach ($FacilityMaster as $facility)
-                                                <div class="form-check mb-1">
-                                                    <input class="form-check-input" type="checkbox" name="facilities[]"
-                                                        id="facility_{{ $facility->id }}" value="{{ $facility->id }}">
-                                                    <label class="form-check-label" for="facility_{{ $facility->id }}">
-                                                        {{ $facility->facility_name }}
-                                                    </label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
+            {{-- Website --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">Website Link</label>
+                <input type="url" name="website_link"
+                       class="form-control @error('website_link') is-invalid @enderror"
+                       value="{{ old('website_link') }}">
+                @error('website_link')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                                <div class="d-flex justify-content-between mt-4">
-                                    <button type="button" class="btn btn-outline-secondary prev-btn"
-                                        data-prev="2">Previous</button>
-                                    <button type="button" class="btn next-btn" data-next="4">Next</button>
-                                </div>
-                            </div>
+            {{-- Instagram --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">Instagram</label>
+                <input type="url" name="instagram_link"
+                       class="form-control @error('instagram_link') is-invalid @enderror"
+                       value="{{ old('instagram_link') }}">
+                @error('instagram_link')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                            <!-- STEP 4: Hotel Images -->
-                            <div class="step-content d-none" id="step4">
-                                <p class="select">Add Hotel Images</p>
-                                <div class="row g-3 align-items-end">
-                                    @for ($i = 1; $i <= 4; $i++)
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="image_{{ $i }}">Upload Image
-                                                    {{ $i }}</label>
-                                                <input type="file" name="images[]" id="image_{{ $i }}"
-                                                    class="form-control" accept="image/*" required>
-                                            </div>
-                                        </div>
+            {{-- Facebook --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">Facebook</label>
+                <input type="url" name="facebook_link"
+                       class="form-control @error('facebook_link') is-invalid @enderror"
+                       value="{{ old('facebook_link') }}">
+                @error('facebook_link')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                                        <div class="col-md-6 d-flex align-items-center">
-                                            <div class="form-check mt-4">
-                                                <input class="form-check-input" type="radio" name="cover_image"
-                                                    id="cover_{{ $i }}" value="{{ $i }}">
-                                                <label class="form-check-label" for="cover_{{ $i }}">Set as
-                                                    Cover Image</label>
-                                            </div>
-                                        </div>
-                                    @endfor
-                                </div>
+            {{-- Telegram --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">Telegram</label>
+                <input type="url" name="telegram_link"
+                       class="form-control @error('telegram_link') is-invalid @enderror"
+                       value="{{ old('telegram_link') }}">
+                @error('telegram_link')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                                <div class="d-flex justify-content-between mt-4">
-                                    <button type="button" class="btn btn-outline-secondary prev-btn"
-                                        data-prev="3">Previous</button>
-                                    <button type="button" class="btn next-btn" data-next="5">Next</button>
-                                </div>
-                            </div>
+            {{-- Country --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">Country</label>
+                <input type="text" name="country"
+                       class="form-control"
+                       value="India" readonly>
+            </div>
 
-                            <!-- STEP 5: Hotel Policies -->
-                            <div class="step-content d-none" id="step5">
-                                <p class="select">Add Hotel Policies</p>
-                                <div class="row g-3">
-                                    <div class="form-group col-md-6">
-                                        <label for="check_in_time" class="form-label">Check-in Time</label>
-                                        <input type="time" name="check_in_time" id="check_in_time"
-                                            value="{{ old('check_in_time') }}" required class="form-control">
-                                    </div>
+            {{-- State --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">State</label>
+                <select name="state"
+                        class="form-control @error('state') is-invalid @enderror"
+                        required>
+                    <option value="">Select State</option>
+                    @php
+                        $states = [
+                            'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh',
+                            'Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand',
+                            'Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur',
+                            'Meghalaya','Mizoram','Nagaland','Odisha','Punjab',
+                            'Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura',
+                            'Uttar Pradesh','Uttarakhand','West Bengal',
+                            'Andaman and Nicobar Islands','Chandigarh',
+                            'Dadra and Nagar Haveli and Daman and Diu',
+                            'Delhi','Jammu and Kashmir','Ladakh',
+                            'Lakshadweep','Puducherry'
+                        ];
+                    @endphp
+                    @foreach($states as $state)
+                        <option value="{{ $state }}" {{ old('state') == $state ? 'selected' : '' }}>
+                            {{ $state }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('state')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                                    <div class="form-group col-md-6">
-                                        <label for="check_out_time" class="form-label">Check-out Time</label>
-                                        <input type="time" name="check_out_time" id="check_out_time"
-                                            value="{{ old('check_out_time') }}" required class="form-control">
-                                    </div>
+            {{-- City --}}
+            <div class="form-group col-md-6">
+                <label class="fw-bold">City</label>
+                <input type="text" name="city"
+                       class="form-control @error('city') is-invalid @enderror"
+                       value="{{ old('city') }}">
+                @error('city')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
-                                    <div class="form-group col-md-12">
-                                        <textarea name="cancellation_policy" rows="4" class="form-control ckeditor" placeholder="Cancellation Policy"
-                                            required>{{ old('cancellation_policy') }}</textarea>
-                                    </div>
-                                    <div class="form-group col-md-12">
-                                        <textarea name="extra_bed_policy" rows="4" class="form-control ckeditor" placeholder="Extra Bed Policy"
-                                            required>{{ old('extra_bed_policy') }}</textarea>
-                                    </div>
-                                    <div class="form-group col-md-12">
-                                        <textarea name="child_policy" rows="4" class="form-control ckeditor" placeholder="Child Policy" required>{{ old('child_policy') }}</textarea>
-                                    </div>
-                                </div>
+            {{-- Auto Send --}}
+            <div class="form-group col-md-6 mt-2">
+                <div class="form-check">
+                    <input type="checkbox" name="auto_send"
+                           class="form-check-input"
+                           value="1" {{ old('auto_send') ? 'checked' : '' }}>
+                    <label class="form-check-label fw-bold">
+                        Automatically send this message
+                    </label>
+                </div>
+            </div>
 
-                                <div class="d-flex justify-content-between mt-4">
-                                    <button type="button" class="btn btn-outline-secondary prev-btn"
-                                        data-prev="4">Previous</button>
-                                    <button type="submit" class="btn btn-success">Finish</button>
-                                </div>
-                            </div>
+            {{-- Total Users --}}
+            <div class="form-group col-md-6 mt-2">
+                <label class="fw-bold">Total Users</label>
+                <input type="number" name="total_users"
+                       class="form-control @error('total_users') is-invalid @enderror"
+                       value="{{ old('total_users') }}">
+                @error('total_users')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+        </div>
+
+        {{-- Buttons --}}
+        <div class="text-end mt-4">
+            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+            <button type="submit" class="btn btn-success">Send Message</button>
+        </div>
+
+    </div>
+</form>
+
+
+
+
 
 
 
@@ -205,8 +229,8 @@
 
 @section('scripts')
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.25.1/standard/ckeditor.js"></script>
-<script src="https://cdn.ckeditor.com/4.25.1/standard/ckeditor.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.25.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.25.1/standard/ckeditor.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -216,190 +240,8 @@
         });
     </script>
 
-     <script>
-                                document.querySelector("form").addEventListener("submit", function(e) {
-                                    let cancel = CKEDITOR.instances['cancellation_policy'].getData().trim();
-                                    let bed = CKEDITOR.instances['extra_bed_policy'].getData().trim();
-                                    let child = CKEDITOR.instances['child_policy'].getData().trim();
-
-                                    if (!cancel) {
-                                        alert("Cancellation Policy is required");
-                                        e.preventDefault();
-                                        return false;
-                                    }
-
-                                    if (!bed) {
-                                        alert("Extra Bed Policy is required");
-                                        e.preventDefault();
-                                        return false;
-                                    }
-
-                                    if (!child) {
-                                        alert("Child Policy is required");
-                                        e.preventDefault();
-                                        return false;
-                                    }
-                                });
-                            </script>
-
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const steps = document.querySelectorAll(".step-content");
-            const circles = document.querySelectorAll(".step-circle");
-
-            // Show the correct step
-            function showStep(step) {
-                steps.forEach((s, i) => s.classList.toggle("d-none", i + 1 !== step));
-                circles.forEach((c, i) => c.classList.toggle("active", i + 1 <= step));
-            }
-
-            // Validate required inputs in the current step
-            function validateStep(step) {
-                const currentStep = document.querySelector(`#step${step}`);
-                const requiredFields = currentStep.querySelectorAll("[required]");
-                let allValid = true;
-
-                requiredFields.forEach(field => {
-                    if (!field.value || (field.type === "checkbox" && !field.checked)) {
-                        field.classList.add("is-invalid");
-                        allValid = false;
-                    } else {
-                        field.classList.remove("is-invalid");
-                    }
-                });
-
-                if (!allValid) {
-                    // Scroll to first invalid field for better UX
-                    const firstInvalid = currentStep.querySelector(".is-invalid");
-                    if (firstInvalid) firstInvalid.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center"
-                    });
-                }
-
-                return allValid;
-            }
-
-            // Handle "Next" button
-            document.querySelectorAll(".next-btn").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const currentStep = parseInt(btn.closest(".step-content").id.replace("step",
-                        ""));
-                    if (validateStep(currentStep)) {
-                        const nextStep = parseInt(btn.dataset.next);
-                        showStep(nextStep);
-                    } else {
-                        alert("Please fill all required fields before proceeding.");
-                    }
-                });
-            });
-
-            // Handle "Previous" button
-            document.querySelectorAll(".prev-btn").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const prevStep = parseInt(btn.dataset.prev);
-                    showStep(prevStep);
-                });
-            });
-
-            // Start at Step 1
-            showStep(1);
-        });
-    </script>
-
-
-
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const locationSelect = document.getElementById('location_id');
-            const localitySelect = document.getElementById('locality_id');
-
-            locationSelect.addEventListener('change', function() {
-                const locationId = this.value;
-                localitySelect.innerHTML = '<option value="">Loading...</option>';
-
-                // alert(locationId);
-                if (locationId) {
-                    fetch(`/locality-check/${locationId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            localitySelect.innerHTML = '<option value="">Select Locality</option>';
-                            data.forEach(locality => {
-                                const option = document.createElement('option');
-                                option.value = locality.id;
-                                option.textContent = locality.name;
-                                localitySelect.appendChild(option);
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error fetching localities:', error);
-                            localitySelect.innerHTML =
-                                '<option value="">Error loading localities</option>';
-                        });
-                } else {
-                    localitySelect.innerHTML = '<option value="">Select Locality</option>';
-                }
-            });
-        });
-    </script>
-
-
-    <script>
-        $(document).ready(function() {
-            $('#facility_group_id').on('change', function() {
-                var groupId = $(this).val();
-                var $facilityContainer = $('#facilityCheckboxes');
-
-                // Show loading message
-                $facilityContainer.html('<p class="text-info m-0">Loading facilities...</p>');
-
-                if (groupId) {
-                    $.ajax({
-                        url: '/facilities-check/' + groupId,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(data) {
-                            if (data.length > 0) {
-                                $facilityContainer.empty(); // Clear old checkboxes
-
-                                $.each(data, function(index, facility) {
-                                    var checkboxHtml = `
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox"
-                                           name="facilities[]"
-                                           id="facility_${facility.id}"
-                                           value="${facility.id}">
-                                    <label class="form-check-label" for="facility_${facility.id}">
-                                        ${facility.facility_name}
-                                    </label>
-                                </div>
-                            `;
-                                    $facilityContainer.append(checkboxHtml);
-                                });
-                            } else {
-                                $facilityContainer.html(
-                                    '<p class="text-muted m-0">No facilities found for this group.</p>'
-                                );
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error fetching facilities:', error);
-                            $facilityContainer.html(
-                                '<p class="text-danger m-0">Error loading facilities.</p>');
-                        }
-                    });
-                } else {
-                    $facilityContainer.html(
-                        '<p class="text-muted m-0">Select a facility group first...</p>');
-                }
-            });
-        });
-    </script>
-
-
+    
+  
 
 
 

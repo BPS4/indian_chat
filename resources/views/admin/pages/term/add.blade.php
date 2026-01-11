@@ -8,8 +8,8 @@
                     <form method="POST" action="{{ route('term.store') }}" class="w-100" enctype="multipart/form-data">
                         {{ csrf_field() }}
                         <div class="col-lg-9 col-xl-12 mt-3">
-                            <h3>Add New Term</h3>
-                            <p>Enter the details to create new Term</p>
+                            <h3>Add app Logo</h3>
+                            <p>Enter the details to create App Logo</p>
                             <div class="row align-items-center">
                                 <div class="form-group col-md-6">
 
@@ -17,7 +17,14 @@
                                             isrequired="required" class="form-control" placeholder="Enter Title">
                                     </div>
                                 </div>
-                                <div class="form-group  col-md-6">
+                                 <div class="form-group col-md-6">
+
+                                    <div><input type="file" name="logo" value="{{ old('logo') }}"
+                                            isrequired="required" class="form-control" placeholder="Enter Logo">
+                                    </div>
+                                </div>
+
+                                {{-- <div class="form-group  col-md-6">
                                     <select name="is_active" required class="form-control">
                                         <option value="" disabled selected>Select Status</option>
                                         <option value=1>Active</option>
@@ -26,7 +33,7 @@
                                 </div>
                                 <div class="form-group col-md-12">
                                     <textarea name="content" id="content-editor" class="form-control" placeholder="Enter Content">{{ old('content') }}</textarea>
-                                </div>
+                                </div> --}}
 
 
 

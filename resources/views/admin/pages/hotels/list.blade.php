@@ -5,21 +5,21 @@
     <div class="card card-custom">
         <div class="card-header flex-wrap border-0 pt-3 pb-0">
             <div class="card-title">
-                <h3 class="card-label">Hotel Management
+                <h3 class="card-label">Message Management
                 </h3>
-                <p>Manage your hotels, rooms, and pricing</p>
+                <p>Manage your messages</p>
             </div>
             <div class="card-toolbar">
                 <!--begin::Button-->
-                <a href="{{ url('/admin/hotels/add') }}" class="btn btn-primary font-weight-bolder">
-                    + Add Hotel</a>
+                <a href="{{ url('/admin/message/add') }}" class="btn btn-primary font-weight-bolder">
+                    + Add Message</a>
                 <!-- <div>
                                                         <img src="{{ asset('media/icons/card-icon.png') }}" alt="">
                                                     </div> -->
-                <div>
+                {{-- <div>
                     <img src="{{ asset('media/icons/card-icon.png') }}" alt="" id="toggleViewIcon"
                         style="cursor:pointer;">
-                </div>
+                </div> --}}
 
             </div>
 
@@ -83,37 +83,14 @@
                                         href="{{ url('/admin/hotels/list') . '?search=' . request('search') . '&status=Active' }}">
                                         Active
                                     </a></li>
-                                <li><a class="dropdown-item"
-                                        href="{{ url('/admin/hotels/list') . '?search=' . request('search') . '&status=Maintenance' }}">
-                                        Maintenance
-                                    </a></li>
+                               
                             </ul>
                         </div>
 
 
 
                         <!-- Location Dropdown -->
-                        <div class="dropdown">
-                            <button class="btn btn-lg dropdown-toggle" type="button" id="locationDropdown"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ request('location') ?? 'All Location' }}
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="locationDropdown">
-                                <!-- All Locations -->
-                                <li><a class="dropdown-item"
-                                        href="{{ request()->fullUrlWithQuery(['location' => '']) }}">All Location</a></li>
-
-                                <!-- Dynamic Cities -->
-                                @foreach ($locations as $city)
-                                    <li>
-                                        <a class="dropdown-item"
-                                            href="{{ request()->fullUrlWithQuery(['location' => $city]) }}">
-                                            {{ $city }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
+                       
 
 
                     </form>
@@ -127,12 +104,13 @@
                     <thead>
                         <tr>
                             <th class="custom_sno"> Id</th>
-                            <th>Hotel Name</th>
-                            <th>Total Rooms</th>
-                            <th>Address</th>
-                            <th>Status </th>
-                            <th>total Revenue</th>
-                            <th class="custom_action">Action</th>
+                         
+                            <th>Calling no</th>
+                            <th>website link</th>
+                            <th>State</th>
+                            <th>city</th>
+                            <th>Total Users</th>
+                          
                         </tr>
                     </thead>
                     <tbody>
@@ -142,36 +120,13 @@
 
                                 {{-- <td class="custom_sno">{{ $hotel->id }} </td> --}}
                                           <td>{{ $loop->iteration }}</td>
-                                <td>{{ $hotel->name }} </td>
-                                <td>{{ $hotel->roomTypes->sum(fn($rt) => $rt->inventories->sum('available_rooms')) }}</td>
-                                <td>{{ $hotel->address }} </td>
-                                <td>
-                                    <span
-                                        class="status-badge {{ $hotel->status === 'active' ? 'badge-active' : 'badge-inactive' }}"
-                                        style="cursor: pointer; background-color: {{ $hotel->status === 'active' ? '#20c997' : 'red' }};"
-                                        data-hotel-id="{{ $hotel->id }}" onclick="toggleHotelStatus(this)">
-                                        {{ $hotel->status === 'active' ? 'Active' : 'Maintenance' }}
-                                    </span>
-                                </td>
+                                <td>{{ $hotel->calling_number }} </td>
+                                <td>{{ $hotel->website_link }}</td>
+                                <td>{{ $hotel->state }} </td>
+                                <td>{{ $hotel->city }} </td>   
+                                <td>{{ $hotel->total_users }} </td>     
 
-                                <td>
-                                    @php
-                                        $totalRevenue = $hotel->booking_payments->sum('amount'); // sum of payments
-                                    @endphp
-                                    Rs {{ number_format($totalRevenue, 2) }}
-
-                                </td>
-
-                                <td class="custom_action">
-                                    <a href="{{ url('/admin/hotels/edit/' . $hotel->id) }}"
-                                        class="btn btn-sm btn-clean btn-icon" title="Edit details" data-toggle="tooltip">
-                                        <i class="la la-edit"></i>
-                                    </a>
-                                    <a href="{{ route('hotel-room.index', $hotel->id) }}"
-                                        class="btn btn-sm btn-clean btn-icon" title="Add rooms" data-toggle="tooltip">
-                                        <i class="la la-bed"></i>
-                                    </a>
-                                </td>
+                               
                         @endforeach
 
 
@@ -182,73 +137,7 @@
 
             </div>
 
-            <div id="cardView" class="row" style="display:none;">
-                <div class="row g-4">
-                    @foreach ($hotels as $hotel)
-                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                            <div class="hotel-card h-100">
-                                <!-- Hotel name and status -->
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <div class="">{{ $hotel->name }}</div>
-                                    <span
-                                        class="status-badge {{ $hotel->status === 'active' ? 'badge-active' : 'badge-inactive' }}"
-                                        style="cursor: pointer; background-color: {{ $hotel->status === 'active' ? '#20c997' : 'red' }};"
-                                        data-hotel-id="{{ $hotel->id }}" onclick="toggleHotelStatus(this)">
-                                        {{ $hotel->status === 'active' ? 'Active' : 'Maintenance' }}
-                                    </span>
-
-
-                                </div>
-
-                                <!-- Location -->
-                                <div class="d-flex mb-5">
-                                    <span><img src="{{ asset('media/icons/location1.png') }}" alt=""> </span>
-                                    {{ $hotel->address ?? 'N/A' }}
-                                </div>
-
-                                <!-- Rating and total rooms -->
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div class="d-flex justify-content-between align-items-center gap-2 star">
-                                        <span><img src="{{ asset('media/icons/emoji_star.png') }}" alt=""></span>
-                                        {{ $hotel->rating_avg ?? '0' }}
-                                    </div>
-                                    <div class="text-gray">
-                                        {{-- Sum of all available rooms from inventories --}}
-                                        {{ $hotel->roomTypes->sum(fn($rt) => $rt->inventories->sum('available_rooms')) ?? 0 }}
-                                        Rooms
-                                    </div>
-                                </div>
-
-                                <!-- Features (Optional) -->
-                                <div class="d-flex flex-wrap mb-4 gap-2">
-                                    @foreach ($hotel->roomTypes as $roomType)
-                                        @if ($roomType->room_name)
-                                            <span class="feature-btn">{{ $roomType->room_name }}</span>
-                                        @endif
-                                    @endforeach
-                                </div>
-
-                                <!-- Monthly Revenue (Static for now, replace if dynamic) -->
-                                <div class="pt-2 mb-1 text-muted monthly-revenue">Monthly Revenue</div>
-                                <div class="revenue mb-5">
-                                    @php
-                                        $totalRevenue = $hotel->booking_payments->sum('amount'); // sum of payments
-                                    @endphp
-                                    Rs {{ number_format($totalRevenue, 2) }}
-
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-edit"><a href="{{ url('/admin/hotels/edit/' . $hotel->id) }}"
-                                            class="btn btn-sm  btn-icon" title="Edit details" data-toggle="tooltip">Edit
-                                        </a></button>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
+         
 
 
             {{-- {{ $details->links('pagination::bootstrap-5') }} --}}

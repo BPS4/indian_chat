@@ -8,7 +8,7 @@
             <div class="card-title">
                 <h3 class="card-label">Dashboard Overview
                 </h3>
-                <p>Welcome back! Here's what's happening at your hotels today.</p>
+                <p>Welcome back! Here's what's happening In your Bussiness.</p>
             </div>
             <div class="card-toolbar">
                 <!--begin::Button-->
@@ -29,7 +29,7 @@
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="payment-card shadow-sm">
                             <div class="payment-card-title">
-                                <span>Total Bookings</span>
+                                <span>Total Users</span>
                                 <!-- <i class="bi bi-house"></i> -->
                                 <img src="{{ asset('media/icons/total-bookings.png') }}" alt="">
 
@@ -43,7 +43,7 @@
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="payment-card shadow-sm">
                             <div class="payment-card-title rupees">
-                                <span>Monthly Revenue</span>
+                                <span>Total Admin</span>
                                 <img src="{{ asset('media/icons/rupees.png') }}" alt="">
                             </div>
                             <h4 class="payment-card-amount py-4">₹{{ $monthlyRevenue['amount'] }}
@@ -56,7 +56,7 @@
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="payment-card shadow-sm">
                             <div class="payment-card-title">
-                                <span>Active Customers</span>
+                                <span>Total Message</span>
                                 <img src="{{ asset('media/icons/active-customer.png') }}" alt="">
                             </div>
                             <h4 class="payment-card-amount py-4">{{ $customers['percentage'] }}%</h4>
@@ -68,7 +68,7 @@
                     <div class="col-12 col-sm-6 col-md-3">
                         <div class="payment-card shadow-sm">
                             <div class="payment-card-title">
-                                <span>Occupancy Rate</span>
+                                <span>Total States</span>
                                 <img src="{{ asset('media/icons/pending-payment.png') }}" alt="">
                             </div>
                             @php $occupacy = occupacyRate(); @endphp
@@ -86,115 +86,7 @@
 
 
 
-            <div class="hotel-dashboard container-fluid">
-
-                <div class="row g-4 mb-4">
-                    <!-- Revenue and Booking Trend -->
-                    <div class="col-lg-7">
-                        <div class="card p-3 h-100">
-                            <h5>Revenue and Booking Trend</h5>
-                            <p>Monthly revenue and booking trends over the last 6 months</p>
-                            <div class="chart-container">
-                                <canvas id="revenueChart"></canvas>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!-- Room Type Occupancy -->
-                    <div class="col-lg-5">
-                        <div class="card p-3 h-100">
-                            <h5>Room Type Occupancy</h5>
-                            <p>Current occupancy rates by room type</p>
-                            <div class="chart-container">
-                                <canvas id="occupancyChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-4 mt-5">
-                    <!-- Upcoming Check-In -->
-                    <div class="col-lg-6">
-                        <div class="card p-3">
-                            <div class="d-flex justify-content-between align-items-center mb-5">
-                                <div>
-                                    <h5>Today Upcoming Check-In</h5>
-                                    <p>Today expected arrivals</p>
-                                </div>
-                                <select class="form-select w-auto" id="hotelFilter">
-                                    <option value=" ">All Hotels</option>
-                                    @foreach ($hotels as $hotel)
-                                        <option value="{{ $hotel->id }}"
-                                            {{ $hotel->id == $hotelId ? 'selected' : '' }}>{{ $hotel->name }}</option>
-                                    @endforeach
-
-                                </select>
-                            </div>
-
-                            <div class="d-flex flex-column gap-3 mt-5">
-                                @foreach ($upcomingCheckIns as $upcomingCheckIn)
-                                    <div class="check-card">
-                                        <div class="guest-info">
-                                            <h6>{{ $upcomingCheckIn->guests?->first()->guest_name ?? null }}</h6>
-                                            <small>{{ $upcomingCheckIn->rooms->first()->roomType->room_name }}</small>
-                                        </div>
-                                        <div class="guest-time">
-                                            {{ date('h:i A', strtotime($upcomingCheckIn->checkin_time)) }}
-
-                                        </div>
-                                        <small>{{ $upcomingCheckIn->hotel->name }}</small>
-
-                                        <div class="guest-count">{{ $upcomingCheckIn->guests_count }} Guest</div>
-                                    </div>
-                                @endforeach
-
-
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Upcoming Check-Out -->
-                    <div class="col-lg-6">
-                        <div class="card p-3">
-                            <div class="d-flex justify-content-between align-items-center mb-5">
-                                <div>
-                                    <h5>Today Upcoming Check-Out</h5>
-                                    <p>Today expected Departure</p>
-                                </div>
-                                <select class="form-select w-auto" id="hotelFilterUpcoming">
-                                    <option value="">All Hotels</option>
-                                    @foreach ($hotels as $hotel)
-                                        <option value="{{ $hotel->id }}"
-                                            {{ $hotel->id == $upcominghotelId ? 'selected' : '' }}>
-                                            {{ $hotel->name }}</option>
-                                    @endforeach
-
-                                </select>
-                            </div>
-
-                            <div class="d-flex flex-column gap-3 mt-5">
-                                @foreach ($upcomingCheckOuts as $upcomingCheckOut)
-                                    <div class="check-card">
-                                        <div class="guest-info">
-                                            <h6>{{ $upcomingCheckOut->guests?->first()->guest_name ?? null }}</h6>
-                                            <small>{{ $upcomingCheckOut->rooms->first()->roomType->room_name }}</small>
-                                        </div>
-                                        <div class="guest-time">
-                                            {{ date('h:i A', strtotime($upcomingCheckOut->checkin_time)) }}
-
-                                        </div>
-                                        <small>{{ $upcomingCheckOut->hotel->name }}</small>
-
-                                        <div class="guest-count">{{ $upcomingCheckOut->guests_count }} Guest</div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+           
 
 
             @php $chartData = roomAnalyticsChart();    @endphp

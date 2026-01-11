@@ -23,8 +23,8 @@ class CustomerController extends Controller
                 ],
             ];
 
-            $users = User::with(['bookings', 'booking_payments'])
-                ->where('role_id', 2) // only customers
+            $users = User::
+               where('role_id', 2) // only customers
                 ->when($request->search, function ($query, $search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('name', 'LIKE', "%{$search}%")
@@ -72,37 +72,7 @@ class CustomerController extends Controller
                 ],
             ];
 
-            // $users = User::query()
-            //     ->select(
-            //         'users.id as user_id',
-            //         'users.name',
-            //         'users.email',
-            //         'users.mobile',
-            //         'users.status',
-            //      'users.created_at',
-
-            //         // Booking details
-            //         'booking.booking_id as booking_id',
-            //         'booking.checkin_date',
-            //         'booking.checkout_date',
-            //         'booking.status as booking_status',
-
-            //         // Payment details
-            //         'booking_payments.amount as payment_amount',
-            //         'booking_payments.transaction_id as transaction_id',
-            //         'booking_payments.payment_status as payment_status',
-
-            //         // Room details
-            //         'booking_rooms.room_type_id',
-            //         'room_types.room_name as room_type_name'
-            //     )
-            //     ->leftJoin('booking', 'booking.user_id', '=', 'users.id')
-            //     ->leftJoin('booking_payments', 'booking_payments.booking_id', '=', 'booking.booking_id')
-            //     ->leftJoin('booking_rooms', 'booking_rooms.booking_id', '=', 'booking.id')
-            //     ->leftJoin('room_types', 'room_types.id', '=', 'booking_rooms.room_type_id')
-            //     ->where('users.id', $id)
-            //     ->orderByDesc('users.id')
-            //     ->paginate(50);
+          
 
             $user = User::with([
                 'bookings',

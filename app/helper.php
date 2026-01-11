@@ -42,8 +42,8 @@ function modulesList()
         ],
         [
             'id' => 2,
-            'slug' => 'hotels',
-            'module_name' => 'hotels',
+            'slug' => 'message',
+            'module_name' => 'message',
         ],
         [
             'id' => 3,
@@ -52,85 +52,17 @@ function modulesList()
         ],
         [
             'id' => 4,
-            'slug' => 'bookings',
-            'module_name' => 'bookings',
+            'slug' => 'withdrawal',
+            'module_name' => 'withdrawal',
         ],
-        [
-            'id' => 5,
-            'slug' => 'Offers',
-            'module_name' => 'Offers',
-        ],
-        [
-            'id' => 6,
-            'slug' => 'Payments',
-            'module_name' => 'Payments',
-        ],
-        [
-            'id' => 7,
-            'slug' => 'location',
-            'module_name' => 'Location',
-        ],
-        [
-            'id' => 8,
-            'slug' => 'locality',
-            'module_name' => 'Locality',
-        ],
-        [
-            'id' => 9,
-            'slug' => 'addons',
-            'module_name' => 'Addons',
-        ],
-        [
-            'id' => 9,
-            'slug' => 'facility-group',
-            'module_name' => 'Facility Group',
-        ],
-        [
-            'id' => 10,
-            'slug' => 'facility',
-            'module_name' => 'Facility',
-        ],
-        [
-            'id' => 11,
-            'slug' => 'coupons',
-            'module_name' => 'Coupon',
-        ],
+       
+      
         [
             'id' => 12,
             'slug' => 'profile',
             'module_name' => 'profile',
         ],
-        [
-            'id' => 13,
-            'slug' => 'gift-card',
-            'module_name' => 'Gift Card',
-        ],
-        [
-            'id' => 14,
-            'slug' => 'reviews',
-            'module_name' => 'Reviews',
-        ],
-        [
-            'id' => 15,
-            'slug' => 'slider',
-            'module_name' => 'Slider',
-        ],
-        [
-            'id' => 16,
-            'slug' => 'term',
-            'module_name' => 'Term',
-        ],
-        [
-            'id' => 16,
-            'slug' => 'guest-photo',
-            'module_name' => 'Guest Photo',
-        ],
-
-        [
-            'id' => 17,
-            'slug' => 'search',
-            'module_name' => 'search',
-        ],
+       
 
         [
             'id' => 23,

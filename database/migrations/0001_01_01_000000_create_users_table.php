@@ -20,10 +20,14 @@ return new class extends Migration
             $table->integer('role_id');
             $table->date('dob')->nullable();
             $table->string('gender')->nullable();
+            $table->string('country')->nullable();
+            $table->string('state')->nullable();
+            $table->string('city')->nullable();
             $table->tinyInteger('at_whatsapp')->nullable()->default(0);
             $table->string('martial_status')->nullable();
 
             $table->string('email')->unique();
+            $table->string('country_code')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

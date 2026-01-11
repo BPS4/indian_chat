@@ -7,10 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class Message extends Model
 {
     protected $fillable = [
-        'conversation_id',
-        'sender_id',
-        'message',
-        'is_read'
+        'media',
+        'youtube_link',
+        'description',
+        'calling_number',
+        'website_link',
+        'instagram_link',
+        'facebook_link',
+        'telegram_link',
+        'country',
+        'state',
+        'city',
+        'auto_send',
+        'total_users'
     ];
 
     public function sender()

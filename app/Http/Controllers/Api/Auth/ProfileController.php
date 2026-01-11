@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -40,25 +41,52 @@ class ProfileController extends Controller
         $user->dob            = $request->input('dob', $user->dob);
         $user->gender         = $request->input('gender', $user->gender);
         $user->email          = $request->input('email', $user->email);
+        $user->country        = $request->input('country', $user->country);
+        $user->state          = $request->input('state', $user->state);
+        $user->city           = $request->input('city', $user->city);
+        $user->country_code = $request->input('country_code', $user->country_code);
         $user->mobile         = $request->input('mobile', $user->mobile);
         $user->at_whatsapp    = $request->input('at_whatsapp', $user->at_whatsapp);
         $user->martial_status = $request->input('martial_status', $user->martial_status);
 
 
-        // if ($request->hasFile('profile_pic')) {
-        //     if ($user->profile_pic && Storage::disk('public')->exists($user->profile_pic)) {
-        //         Storage::disk('public')->delete($user->profile_pic);
-        //     }
+        // ✅ Profile Picture Upload
+        if ($request->hasFile('profile_pic')) {
 
-        //     $path = $request->file('profile_pic')->store('profile_pics', 'public');
-        //     $user->profile_pic = $path;
-        // }
+            // Delete old image if exists
+            if ($user->profile_pic && Storage::disk('public')->exists($user->profile_pic)) {
+                Storage::disk('public')->delete($user->profile_pic);
+            }
+
+            // Store new image
+            $path = $request->file('profile_pic')->store('profile_pics', 'public');
+            $user->profile_pic = $path;
+        }
+
+
 
         $user->save();
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'user'    => $user
+            'user' => [
+                'id'              => $user->id,
+                'name'            => $user->name,
+                'email'           => $user->email,
+                'mobile'          => $user->mobile,
+                'country'         => $user->country,
+                'state'           => $user->state,
+                'city'            => $user->city,
+                'country_code'    => $user->country_code,
+                'dob'             => $user->dob,
+                'gender'          => $user->gender,
+                'martial_status'  => $user->martial_status,
+                'at_whatsapp'     => $user->at_whatsapp,
+                'profile_pic'     => $user->profile_pic,
+                'profile_pic_url' => $user->profile_pic
+                    ? asset('storage/' . $user->profile_pic)
+                    : null,
+            ]
         ], 200);
     }
 }

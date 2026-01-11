@@ -5,14 +5,14 @@
     <div class="card card-custom">
         <div class="card-header flex-wrap border-0 pt-3 pb-0">
             <div class="card-title">
-                <h3 class="card-label">Term & Conditions
+                <h3 class="card-label">App Logo
                 </h3>
-                <p>Manage Term & Conditions</p>
+                <p>Manage App Logo</p>
             </div>
             <div class="card-toolbar">
 
                 <a href="{{ route('term.create') }}" class="btn btn-primary font-weight-bolder">
-                    + Add Term & Conditions</a>
+                    + Add App Logo</a>
 
 
 
@@ -40,7 +40,7 @@
                             <tr>
                                 <th> ID</th>
                                 <th>Title</th>
-                                <th>Content</th>
+                                <th>Logo</th>
 
                                 <th>Status</th>
                                 <th class="text-center">Action</th>
@@ -51,7 +51,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $term->title }}</td>
-                                    <td>{{ strip_tags($term->content) }}</td>
+                                    <td>{{ strip_tags($term->content) ??Na }}</td>
 
                                     <td>{{ $term->is_active ? 'Active' : 'Inactive' }}</td>
 

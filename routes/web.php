@@ -87,9 +87,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
     });
 
     // Hotel
-    Route::prefix('hotels')->group(function () {
+    Route::prefix('message')->group(function () {
         Route::get('list', [App\Http\Controllers\Admin\HotelController::class, 'hotel_list'])->name('hotels.list');
-        Route::any('add', [App\Http\Controllers\Admin\HotelController::class, 'add_hotel'])->name('hotels.store');
+        Route::any('add', [App\Http\Controllers\Admin\HotelController::class, 'store'])->name('message.store');
         Route::get('edit/{id}', [App\Http\Controllers\Admin\HotelController::class, 'edit'])->name('hotels.edit');
         Route::put('update/{id}', [App\Http\Controllers\Admin\HotelController::class, 'update'])->name('hotels.update');
         Route::post('status/{hotel}/toggle-status', [App\Http\Controllers\Admin\HotelController::class, 'toggleStatus']);
@@ -115,7 +115,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
     });
 
     // Bookings
-    Route::prefix('bookings')->group(function () {
+    Route::prefix('withdrawal')->group(function () {
         Route::get('list', [AdminBookingController::class, 'bookings_list']);
         Route::get('add', [AdminBookingController::class, 'add_booking']);
         Route::post('status/{booking}', [AdminBookingController::class, 'updateStatus']);

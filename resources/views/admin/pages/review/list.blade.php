@@ -7,7 +7,7 @@
             <div class="card-title">
                 <h3 class="card-label">Review
                 </h3>
-                <p>Manage Reviews</p>
+                <p>Manage Refral</p>
             </div>
             <div class="card-toolbar">
 
@@ -38,10 +38,10 @@
                         <thead class="offer-table-header">
                             <tr>
                                 <th>ID</th>
-                                <th>Hotel </th>
-                                <th>Rating </th>
-                                <th>Review </th>
-                                <th>Image</th>
+                                <th>User_id </th>
+                                <th>Refral_id </th>
+                                <th>Refral Name </th>
+                                <th>Joining Date</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -50,29 +50,13 @@
                             @foreach ($reviews as $review)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $review->hotel?->name }}</td>
-                                    <td>
-                                        @php
-                                            $rating = $review->rating;
-                                        @endphp
-                                        <div class="text-warning">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                @if ($i <= $rating)
-                                                    <i class="fas fa-star"></i>
-                                                @else
-                                                    <i class="far fa-star"></i>
-                                                @endif
-                                            @endfor
-                                            <span class="text-muted">({{ number_format($rating, 1) }})</span>
-                                        </div>
-                                    </td>
+                                    <td>ID101</td>
+                                     <td>ID{{ $loop->iteration }}</td>
 
                                     <td>
-                                        <div class="p-2 " style="max-width: 300px;">
-                                            <span>{{ \Illuminate\Support\Str::limit($review->review, 20) }}</span>
-                                        </div>
+                                       
                                     </td>
-                                    <td><img src="{{ asset($review->image) }}" alt="Image" style="height: 60px" /></td>
+                                    <td>22/2/2026</td>
 
                                     {{-- <td>{{ $review->is_approved ? 'Approved' : 'Pending' }}</td> --}}
                                     <td>

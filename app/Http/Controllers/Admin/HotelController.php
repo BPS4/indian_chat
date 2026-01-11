@@ -12,6 +12,8 @@ use App\Models\Localty;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Message;
+use Illuminate\Support\Facades\Log;
 
 class HotelController extends Controller
 {
@@ -29,16 +31,10 @@ class HotelController extends Controller
 
             // dd($request->all());
 
-            $hotels = Hotel::with([
-                'roomTypes',
-                'roomTypes.inventories',
-                'bookings',
-                'booking_payments',
-            ])
-                ->when($request->search, function ($query, $search) {
-                    $query->where('name', 'LIKE', "%{$search}%")
-                        ->orWhere('id', $search);
-                })
+            $hotels = Message::when($request->search, function ($query, $search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('id', $search);
+            })
                 ->when($request->status, function ($query, $status) {
                     if ($status === 'Active') {
                         $query->where('status', 'Active');
@@ -56,22 +52,119 @@ class HotelController extends Controller
                 ->withQueryString();
             // dd($hotels);
 
-            $locations = Hotel::with('location')
-                ->get()
-                ->pluck('location.city')
-                ->unique()
-                ->sort()
-                ->values();
 
-            // dd($locations);
 
-            return view('admin.pages.hotels.list', compact('page_title', 'page_description', 'breadcrumbs', 'hotels', 'locations'));
+
+
+            return view('admin.pages.hotels.list', compact('page_title', 'page_description', 'breadcrumbs', 'hotels',));
         } catch (\Exception $e) {
             dd($e);
 
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+
+    public function store(Request $request)
+    {
+        try {
+
+            // =========================
+            // POST REQUEST → SAVE DATA
+            // =========================
+            if ($request->isMethod('post')) {
+
+                // dd($request->all());
+
+                $validated = $request->validate([
+                    'media'           => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov,avi|max:10240',
+                    'youtube_link'    => 'nullable|url',
+                    'description'     => 'required|string',
+                    'calling_number'  => 'required|string|max:10',
+                    'website_link'    => 'nullable|url',
+                    'instagram_link'  => 'nullable|url',
+                    'facebook_link'   => 'nullable|url',
+                    'telegram_link'   => 'nullable|url',
+                    'state'           => 'required|string',
+                    'city'            => 'nullable|string',
+                    'total_users'     => 'nullable|integer',
+                ]);
+
+                DB::beginTransaction();
+
+                // Take all request data
+                $data = $request->only([
+                    'youtube_link',
+                    'description',
+                    'calling_number',
+                    'website_link',
+                    'instagram_link',
+                    'facebook_link',
+                    'telegram_link',
+                    'state',
+                    'city',
+                    'total_users',
+                ]);
+                $data['country']   = 'India';
+                $data['auto_send'] = $request->has('auto_send');
+
+                if ($request->hasFile('media')) {
+                    $data['media'] = $request->file('media')->store('messages', 'public');
+                }
+
+                Message::create($data);
+
+                DB::commit();
+
+                return redirect()->back()->with('success', 'Message send successfully');
+            }
+
+            // =========================
+            // GET REQUEST → SHOW FORM
+            // =========================
+            $states = [
+                'Andhra Pradesh',
+                'Arunachal Pradesh',
+                'Assam',
+                'Bihar',
+                'Chhattisgarh',
+                'Goa',
+                'Gujarat',
+                'Haryana',
+                'Himachal Pradesh',
+                'Jharkhand',
+                'Karnataka',
+                'Kerala',
+                'Madhya Pradesh',
+                'Maharashtra',
+                'Manipur',
+                'Meghalaya',
+                'Mizoram',
+                'Nagaland',
+                'Odisha',
+                'Punjab',
+                'Rajasthan',
+                'Sikkim',
+                'Tamil Nadu',
+                'Telangana',
+                'Tripura',
+                'Uttar Pradesh',
+                'Uttarakhand',
+                'West Bengal',
+                'Delhi',
+                'Jammu and Kashmir',
+                'Ladakh',
+                'Puducherry'
+            ];
+
+            return view('admin.pages.hotels.add', compact('states'));
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
 
     public function add_hotel(Request $request)
     {
@@ -156,7 +249,7 @@ class HotelController extends Controller
 
                                 // ---- GENERATE CUSTOM NAME ---- //
                                 $extension = $image->getClientOriginalExtension();
-                                $filename = 'hotel_'.$hotel->id.'_'.($index + 1).'.'.$extension;
+                                $filename = 'hotel_' . $hotel->id . '_' . ($index + 1) . '.' . $extension;
 
                                 $path = public_path('images/hotels');
 
@@ -179,7 +272,7 @@ class HotelController extends Controller
 
                                     // ---- UPDATE DB RECORD ---- //
                                     $existingPhotos[$index]->update([
-                                        'photo_url' => 'images/hotels/'.$filename,
+                                        'photo_url' => 'images/hotels/' . $filename,
                                         'is_cover' => ($index + 1) == $request->cover_image ? 1 : 0,
                                     ]);
                                 } else {
@@ -189,7 +282,7 @@ class HotelController extends Controller
 
                                     HotelPhoto::create([
                                         'hotel_id' => $hotel->id,
-                                        'photo_url' => 'images/hotels/'.$filename,
+                                        'photo_url' => 'images/hotels/' . $filename,
                                         'is_cover' => ($index + 1) == $request->cover_image ? 1 : 0,
                                     ]);
                                 }
@@ -384,7 +477,7 @@ class HotelController extends Controller
                 foreach ($request->file('images') as $key => $image) {
 
                     $extension = $image->getClientOriginalExtension();
-                    $filename = 'hotel_'.$hotel->id.'_'.time().'_'.rand(1000, 9999).'.'.$extension;
+                    $filename = 'hotel_' . $hotel->id . '_' . time() . '_' . rand(1000, 9999) . '.' . $extension;
                     $path = public_path('images/hotels');
 
                     if (! file_exists($path)) {
@@ -407,7 +500,7 @@ class HotelController extends Controller
 
                         // update DB record
                         $existingPhoto->update([
-                            'photo_url' => 'images/hotels/'.$filename,
+                            'photo_url' => 'images/hotels/' . $filename,
                             'is_cover' => ($request->cover_image == $key) ? 1 : 0,
                         ]);
                     } else {
@@ -417,7 +510,7 @@ class HotelController extends Controller
 
                         $newPhoto = HotelPhoto::create([
                             'hotel_id' => $hotel->id,
-                            'photo_url' => 'images/hotels/'.$filename,
+                            'photo_url' => 'images/hotels/' . $filename,
                             'is_cover' => ($request->cover_image == $key) ? 1 : 0,
                         ]);
 
@@ -456,7 +549,7 @@ class HotelController extends Controller
 
             DB::rollBack();
 
-            return back()->with('error', 'Update failed: '.$e->getMessage());
+            return back()->with('error', 'Update failed: ' . $e->getMessage());
         }
     }
 
@@ -470,7 +563,7 @@ class HotelController extends Controller
 
             return response()->json($localities);
         } catch (\Exception $e) {
-            Log::error('Error fetching locality: '.$e->getMessage());
+            Log::error('Error fetching locality: ' . $e->getMessage());
 
             return response()->json(['message' => 'Something went wrong', 'error' => $e->getMessage()], 500);
         }

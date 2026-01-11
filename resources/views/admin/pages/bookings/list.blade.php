@@ -5,14 +5,14 @@
 <div class="card card-custom">
     <div class="card-header flex-wrap border-0 pt-3 pb-0">
         <div class="card-title">
-            <h3 class="card-label">Booking Management
+            <h3 class="card-label">Withdrawal Request
             </h3>
-            <p>Manage reservations, check-ins, and cancellations</p>
+            <p>Manage withdrawal request</p>
         </div>
         <div class="card-toolbar">
             <!--begin::Button-->
-            <a href="{{ url('/admin/bookings/add') }}" class="btn btn-primary font-weight-bolder">
-                + New Booking</a>
+            {{-- <a href="{{ url('/admin/bookings/add') }}" class="btn btn-primary font-weight-bolder">
+                + New Booking</a> --}}
             <!-- <div>
                                     <img src="{{ asset('media/icons/card-icon.png') }}" alt="">
                                 </div> -->
@@ -58,7 +58,7 @@
                     </div>
 
                     <!-- Hotel Dropdown -->
-                    <div class="dropdown">
+                    {{-- <div class="dropdown">
                         <button class="btn btn-lg dropdown-toggle" type="button" id="hotelDropdown"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             {{ request('hotel') ?? 'All Hotels' }}
@@ -75,7 +75,7 @@
                             </li>
                             @endforeach
                         </ul>
-                    </div>
+                    </div> --}}
 
                     <!-- Date Dropdown -->
                     <div class="dropdown">
@@ -113,14 +113,11 @@
                     <tr>
                         <th>Id</th>
 
-                        <th>Booking Id</th>
-                        <th>Customer</th>
-                        <th>Hotel & Room</th>
-                        <th>Dates</th>
-                        <th>Guest</th>
+                        <th>User Id</th>
+                        <th>Name</th>
                         <th>Amount</th>
-                        <th>Created By</th>
-                        <th>Payment Method</th>
+                        <th>Date</th>
+                  
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -133,32 +130,12 @@
 
 
                         <td>{{ $booking->booking_id }}</td>
-                        <td>
-                            <div>{{ $booking->guests[0]->guest_name ?? 'N/A' }}</div>
-                            <div class="text-brown small">{{ $booking->guests[0]->email ?? '-' }}</div>
-                        </td>
-                        <td>
-                            <div class="fw-semibold">{{ $booking->hotel->name ?? '-' }}</div>
-                            <div class="text-brown small">
-                                {{ $booking->rooms->first()->roomType->room_name ?? '-' }}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="small">Check-in:
-                                {{ \Carbon\Carbon::parse($booking->checkin_date)->format('d/m/Y') }}
-                            </div>
-                            <div class="small">Check-out:
-                                {{ \Carbon\Carbon::parse($booking->checkout_date)->format('d/m/Y') }}
-                            </div>
-
-                        </td>
-                        <td>
-                            <i class="la la-user"></i> {{ $booking->total_guests }}
-                        </td>
+                        <td></td>
+                       
+                       
                         <td>₹ {{ number_format($booking->total_payable, 2) }} </td>
                         <td>{{ $booking->created_by ?? 'N/A' }}</td>
 
-                        <td>{{ $booking->payment->payment_method ?? 'N/A' }}</td>
 
                         <td>
                             @php

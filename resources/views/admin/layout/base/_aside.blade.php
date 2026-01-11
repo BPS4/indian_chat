@@ -67,7 +67,7 @@
                     </a>
                 </li>
 
-                <li class="menu-item menu-item-submenu @yield('master') @yield('master')" aria-haspopup="true"
+                {{-- <li class="menu-item menu-item-submenu @yield('master') @yield('master')" aria-haspopup="true"
                     data-menu-toggle="hover">
                     <a href="#" class="menu-link menu-toggle">
                         <span class="svg-icon menu-icon">
@@ -91,14 +91,7 @@
                                     </a>
                                 </li>
                             @endif
-                            {{-- @if (isset($existingPermissions['user']) && $existingPermissions['user'] != 0)
-                                <li class="menu-item  @yield('user')" aria-haspopup="true" data-menu-toggle="hover">
-                                    <a href="{{ url('/admin/user/list') }}" class="menu-link menu-toggle">
-                                        <i class="menu-bullet menu-bullet-line"><span></span></i>
-                                        <span class="menu-text">Facility Group</span>
-                                    </a>
-                                </li>
-                            @endif --}}
+                         
                             <li class="menu-item  @yield('facility')" aria-haspopup="true" data-menu-toggle="hover">
                                 <a href="{{ route('facility.index') }}" class="menu-link menu-toggle">
                                     <i class="menu-bullet menu-bullet-line"><span></span></i>
@@ -162,19 +155,19 @@
 
                         </ul>
                     </div>
-                </li>
+                </li> --}}
 
 
-                  @if (isset($existingPermissions['hotels']) && $existingPermissions['hotels'] != 0)
-                    <li class="menu-item menu-item-submenu @yield('hotels')" aria-haspopup="true"
+                  @if (isset($existingPermissions['message']) && $existingPermissions['message'] != 0)
+                    <li class="menu-item menu-item-submenu @yield('message')" aria-haspopup="true"
                         data-menu-toggle="hover">
-                        <a href="{{ url('/admin/hotels/list') }}" class="menu-link menu-toggle">
+                        <a href="{{ url('/admin/message/list') }}" class="menu-link menu-toggle">
                             <span class="svg-icon menu-icon">
                                 <!-- <span class="flaticon2-analytics-1"></span> -->
                                 <span><img src="{{ asset('media/icons/hotel-ico.png') }}" class="w-75"
                                         alt=""> </span>
                             </span>
-                            <span class="menu-text">Hotels</span>
+                            <span class="menu-text">Message</span>
                         </a>
                     </li>
                 @endif
@@ -189,21 +182,21 @@
                                 <span><img src="{{ asset('media/icons/customer-ico.png') }}" class="w-75"
                                         alt=""> </span>
                             </span>
-                            <span class="menu-text">Customer</span>
+                            <span class="menu-text">Users</span>
                         </a>
                     </li>
                 @endif
 
-                @if (isset($existingPermissions['bookings']) && $existingPermissions['bookings'] != 0)
-                    <li class="menu-item menu-item-submenu @yield('bookings') " aria-haspopup="true"
+                @if (isset($existingPermissions['withdrawal']) && $existingPermissions['withdrawal'] != 0)
+                    <li class="menu-item menu-item-submenu @yield('withdrawal') " aria-haspopup="true"
                         data-menu-toggle="hover">
-                        <a href="{{ url('/admin/bookings/list') }}" class="menu-link menu-toggle">
+                        <a href="{{ url('/admin/withdrawal/list') }}" class="menu-link menu-toggle">
                             <span class="svg-icon menu-icon">
                                 <!-- <span class="flaticon2-delivery-package"></span> -->
                                 <span><img src="{{ asset('media/icons/booking-ico.png') }}" class="w-75"
                                         alt=""> </span>
                             </span>
-                            <span class="menu-text">Bookings</span>
+                            <span class="menu-text">Withdrawal</span>
                         </a>
                     </li>
                 @endif
@@ -219,12 +212,12 @@
                                 <span><img src="{{ asset('media/icons/offers-ico.png') }}" class="w-75"
                                         alt=""> </span>
                             </span>
-                            <span class="menu-text">Reviews</span>
+                            <span class="menu-text">Refral</span>
                         </a>
                     </li>
                 @endif
-
-                @if (isset($existingPermissions['Payments']) && $existingPermissions['Payments'] != 0)
+                    
+                {{-- @if (isset($existingPermissions['Payments']) && $existingPermissions['Payments'] != 0)
                     <li class="menu-item menu-item-submenu @yield('Payments')" aria-haspopup="true"
                         data-menu-toggle="hover">
                         <a href="{{ url('/admin/Payments/list') }}" class="menu-link menu-toggle">
@@ -236,7 +229,7 @@
                             <span class="menu-text">Payment</span>
                         </a>
                     </li>
-                @endif
+                @endif --}}
 
 
                 {{-- <li class="menu-item menu-item-submenu  @yield('settings')" aria-haspopup="true"
@@ -284,7 +277,7 @@
                                         data-menu-toggle="hover">
                                         <a href="{{ route('slider.index') }}" class="menu-link menu-toggle">
                                             <i class="menu-bullet menu-bullet-line"><span></span></i>
-                                            <span class="menu-text">Slider</span>
+                                            <span class="menu-text">Refral Commision</span>
                                         </a>
                                     </li>
                                 @endif
@@ -293,11 +286,11 @@
                                         data-menu-toggle="hover">
                                         <a href="{{ route('term.index') }}" class="menu-link menu-toggle">
                                             <i class="menu-bullet menu-bullet-line"><span></span></i>
-                                            <span class="menu-text">Terms</span>
+                                            <span class="menu-text">App Logo</span>
                                         </a>
                                     </li>
                                 @endif
-                                @if (isset($existingPermissions['user']) && $existingPermissions['user'] != 0)
+                                {{-- @if (isset($existingPermissions['user']) && $existingPermissions['user'] != 0)
                                     <li class="menu-item  @yield('user')" aria-haspopup="true"
                                         data-menu-toggle="hover">
                                         <a href="{{ route('guest-photo.index') }}" class="menu-link menu-toggle">
@@ -305,7 +298,7 @@
                                             <span class="menu-text">Guest Photo</span>
                                         </a>
                                     </li>
-                                @endif
+                                @endif --}}
                             </ul>
                         </div>
                     </li>

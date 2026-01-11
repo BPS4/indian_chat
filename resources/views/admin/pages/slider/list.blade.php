@@ -5,9 +5,9 @@
     <div class="card card-custom">
         <div class="card-header flex-wrap border-0 pt-3 pb-0">
             <div class="card-title">
-                <h3 class="card-label">Slider
+                <h3 class="card-label">Refral
                 </h3>
-                <p>Manage Sliders</p>
+                <p>Refral Commision</p>
             </div>
             <div class="card-toolbar">
 
@@ -38,11 +38,9 @@
                         <thead class="offer-table-header">
                             <tr>
                                 <th> ID</th>
-                                <th>Title</th>
-                                <th>Su Title</th>
-                                <th>Image</th>
-                                {{-- <th>Link</th>
-                                <th>Button Text</th> --}}
+                                <th>Joining Bonous</th>
+                                <th>Refral Commision</th>
+                               
                                 <th>Status</th>
                                 <th class="text-center">Action</th>
                             </tr>
@@ -51,10 +49,9 @@
                             @foreach ($sliders as $slider)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $slider->title }}</td>
-                                    <td>{{ $slider->subtitle }}</td>
-                                    <td><img src="{{ asset($slider->image_path) }}" alt="Image" style="height: 60px" />
-                                    </td>
+                                    <td>{{ $slider->titles ?? 100 }}</td>
+                                    <td>{{ $slider->subtitless ??500 }}</td>
+                                  
                                     {{-- <td>{{ $slider->link }}</td>
                                     <td>{{ $slider->button_text }}</td> --}}
                                     <td>{{ $slider->is_active ? 'Active' : 'Inactive' }}</td>

@@ -7,15 +7,15 @@
             <div class="card-title">
                 <h3 class="card-label">Customers
                 </h3>
-                <p>View and manage customer profiles and booking history</p>
+                <p>View and manage customer profiles and Total Earning</p>
             </div>
             <div class="card-toolbar">
                 <!--begin::Button-->
                 {{-- <a href="{{ url('/admin/hotels/add') }}" class="btn btn-primary font-weight-bolder">
                     + Add Customer</a> --}}
                 <!-- <div>
-                            <img src="{{ asset('media/icons/card-icon.png') }}" alt="">
-                        </div> -->
+                                <img src="{{ asset('media/icons/card-icon.png') }}" alt="">
+                            </div> -->
                 {{-- <div>
                     <img src="{{ asset('media/icons/card-icon.png') }}" alt="" id="toggleViewIcon"
                         style="cursor:pointer;">
@@ -25,28 +25,28 @@
 
 
             <!-- <form action="" method="get" class="w-100">
-                        <div class="row col-lg-12 pl-0 pr-0">
-                            <div class="col-sm-3">
-                                <div class="dataTables_length">
-                                    <label>Status</label>
-                                    <select name="status" value="" class="form-control">
-                                        <option value="">All Status</option>
-                                        <option value="0" @if (request('status') == '0') {{ runTimeSelection(0, request('status')) }} @endif>InActive</option>
-                                        <option value="1" @if (request('status') == '1') {{ runTimeSelection(1, request('status')) }} @endif>Active</option>
-                                    </select>
+                            <div class="row col-lg-12 pl-0 pr-0">
+                                <div class="col-sm-3">
+                                    <div class="dataTables_length">
+                                        <label>Status</label>
+                                        <select name="status" value="" class="form-control">
+                                            <option value="">All Status</option>
+                                            <option value="0" @if (request('status') == '0') {{ runTimeSelection(0, request('status')) }} @endif>InActive</option>
+                                            <option value="1" @if (request('status') == '1') {{ runTimeSelection(1, request('status')) }} @endif>Active</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-5">
+                                    <div class="dataTables_length">
+                                        <label cla>&#160; </label>
+                                        <button type="submit" class="btn btn-success mt-7" data-toggle="tooltip" title="Apply Filter">Filter</button>
+                                        <a href="{{ url('/admin/inventory/list') }}" class="btn btn-default mt-7" data-toggle="tooltip" title="Reset Filter">Reset</a>
+
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="col-sm-5">
-                                <div class="dataTables_length">
-                                    <label cla>&#160; </label>
-                                    <button type="submit" class="btn btn-success mt-7" data-toggle="tooltip" title="Apply Filter">Filter</button>
-                                    <a href="{{ url('/admin/inventory/list') }}" class="btn btn-default mt-7" data-toggle="tooltip" title="Reset Filter">Reset</a>
-
-                                </div>
-                            </div>
-                        </div>
-                    </form> -->
+                        </form> -->
 
 
 
@@ -116,15 +116,19 @@
                     <thead>
                         <tr>
                             <th> </th>
-                            <th class="custom_sno">Customer</th>
-                            <th>Contact</th>
-                            <th>Location </th>
-                            <th>Join Date </th>
-                            <th>Booking </th>
-                            <th>Total Spend </th>
+                            <th>Id</th>
+                            <th class="custom_sno">Name</th>
+                            <th class="custom_sno">Details</th>
+
+                            {{-- <th class="custom_sno">Profile Pic</th> --}}
+                            <th>Country</th>
+                            <th>State </th>
+                            <th>City </th>
+                            <th>Joning Date </th>
+                            <th>Total Earning </th>
                             <td>Status</td>
                             <!-- <th>On Hold </th> -->
-                            <th class="custom_action">Action</th>
+                            {{-- <th class="custom_action">Action</th> --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -134,6 +138,9 @@
                                     <img src="{{ asset('media/users/customer-ico.png') }}" alt="image" />
                                 </td>
                                 <td>
+                                </td>
+
+                                <td>
                                     {{ $user->name }}
                                 </td>
                                 <td>
@@ -142,10 +149,13 @@
                                         <div class="text-muted">{{ $user->mobile }}</div>
                                     </div>
                                 </td>
+                                <td>{{ $user->country ?? 'N/A' }}</td>
+                                <td>{{ $user->state ?? 'N/A' }}</td>
                                 <td>{{ $user->city ?? 'N/A' }}</td>
+                                {{-- <td>
+                                </td> --}}
                                 <td>{{ $user->created_at->format('d-m-Y') }}</td>
-                                <td>{{ $user->bookings->count() }}</td>
-                                <td>₹ {{ $user->booking_payments->sum('amount') }}</td>
+                                <td>{{ $user->wallet_amount ?? 'N/A' }}</td>
                                 <td>
                                     @if ($user->status == '1')
                                         <span class="badge badge-success">Active</span>
@@ -153,13 +163,13 @@
                                         <span class="badge badge-danger">Inactive</span>
                                     @endif
                                 </td>
-                                <td class="text-center">
+                                {{-- <td class="text-center">
                                     <a href="{{ url('/admin/customers/view/' . $user->id) }}"
                                         class="border border-0 bg-transparent" data-bs-toggle="tooltip"
                                         title="View Details">
                                         <img src="{{ asset('media/icons/eye.png') }}" class="w-20" alt="">
                                     </a>
-                                </td>
+                                </td> --}}
                             </tr>
                         @endforeach
                     </tbody>
@@ -448,5 +458,5 @@
 
     {{-- page scripts --}}
     <!-- <script src="{{ asset('js/pages/crud/datatables/basic/basic.js') }}" type="text/javascript"></script>
-            <script src="{{ asset('js/app.js') }}" type="text/javascript"></script> -->
+                <script src="{{ asset('js/app.js') }}" type="text/javascript"></script> -->
 @endsection
