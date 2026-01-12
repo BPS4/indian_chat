@@ -5,7 +5,7 @@
         <div class="card-body">
             <div class="mb-7">
                 <div class="row align-items-center">
-                    <form method="POST" action="{{ route('term.store') }}" class="w-100" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('app_logo.store') }}" class="w-100" enctype="multipart/form-data">
                         {{ csrf_field() }}
                         <div class="col-lg-9 col-xl-12 mt-3">
                             <h3>Add app Logo</h3>

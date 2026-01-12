@@ -11,7 +11,7 @@
             </div>
             <div class="card-toolbar">
 
-                <a href="{{ route('term.create') }}" class="btn btn-primary font-weight-bolder">
+                <a href="{{ route('app_logo.create') }}" class="btn btn-primary font-weight-bolder">
                     + Add App Logo</a>
 
 
@@ -59,11 +59,11 @@
 
                                     <td>
 
-                                        <a href="{{ route('term.edit', $term->id) }}"
+                                        {{-- <a href="{{ route('term.edit', $term->id) }}"
                                             class="btn btn-sm text-primary border-0" data-bs-toggle="tooltip"
                                             title="Edit">
                                             <i class="la la-edit"></i>
-                                        </a>
+                                        </a> --}}
                                         {{-- <form action="{{ route('slider.destroy', $slider->id) }}" method="POST"
                                             style="display:inline;"
                                             onsubmit="return confirm('Are you sure you want to delete this slider?');">

@@ -1,6 +1,6 @@
 @extends('admin.layout.default')
 
-@section('Slider', 'active menu-item-open')
+@section('refral_commision', 'active menu-item-open')
 @section('content')
     <div class="card card-custom">
         <div class="card-header flex-wrap border-0 pt-3 pb-0">
@@ -11,8 +11,8 @@
             </div>
             <div class="card-toolbar">
 
-                <a href="{{ route('slider.create') }}" class="btn btn-primary font-weight-bolder">
-                    + Add Slider</a>
+                <a href="{{ route('commmision.create') }}" class="btn btn-primary font-weight-bolder">
+                    + Add commision</a>
 
 
 
@@ -46,42 +46,38 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($sliders as $slider)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $slider->titles ?? 100 }}</td>
-                                    <td>{{ $slider->subtitless ??500 }}</td>
-                                  
-                                    {{-- <td>{{ $slider->link }}</td>
-                                    <td>{{ $slider->button_text }}</td> --}}
-                                    <td>{{ $slider->is_active ? 'Active' : 'Inactive' }}</td>
+                                    @foreach ($commisions as $commision)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $commision->joining_bonus ?? 100 }}</td>
+                                            <td>{{ $commision->referral_commision ??500 }}</td>
+                                        
+                                        
+                                            <td>{{ $commision->Status ? 'Inactive' : 'Active' }}</td>
 
 
 
-                                    <td>
-                                        {{-- <button class="btn btn-sm text-primary border-0" data-bs-toggle="tooltip"
-                                            title="view">
-                                            <i class="la la-eye"></i>
-                                        </button> --}}
-                                        <a href="{{ route('slider.edit', $slider->id) }}"
-                                            class="btn btn-sm text-primary border-0" data-bs-toggle="tooltip"
-                                            title="Edit">
-                                            <i class="la la-edit"></i>
-                                        </a>
-                                        <form action="{{ route('slider.destroy', $slider->id) }}" method="POST"
-                                            style="display:inline;"
-                                            onsubmit="return confirm('Are you sure you want to delete this slider?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm text-danger border-0"
-                                                data-bs-toggle="tooltip" title="Delete">
-                                                <i class="la la-trash"></i>
-                                            </button>
-                                        </form>
+                                            {{-- <td>
+                                                
+                                                <a href="{{ route('commision.edit', $commision->id) }}"
+                                                    class="btn btn-sm text-primary border-0" data-bs-toggle="tooltip"
+                                                    title="Edit">
+                                                    <i class="la la-edit"></i>
+                                                </a>
+                                                <form action="{{ route('commision.destroy', $commision->id) }}" method="POST"
+                                                    style="display:inline;"
+                                                    onsubmit="return confirm('Are you sure you want to delete this slider?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm text-danger border-0"
+                                                        data-bs-toggle="tooltip" title="Delete">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </form>
 
-                                    </td>
-                                </tr>
-                            @endforeach
+                                            </td> --}}
+                                        </tr>
+                                    @endforeach
 
                         </tbody>
                     </table>

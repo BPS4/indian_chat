@@ -128,28 +128,34 @@
         });
 
         window.onload = function() {
-        console.log('Echo loaded:', Echo !== undefined);
-            Echo.channel('user-message')
-                .listen('.MessageSent', function(data) {
-                //          console.log('EVENT RECEIVED:', data);
-                // alert(data.sender_id);
-
+            console.log('Echo loaded:', Echo !== undefined);
+            
+            const chatId = {{ $chat_id ?? 1 }}; // Make sure to pass this from controller
+            const currentUserId = {{ auth()->id() ?? 0 }};
+            
+            // Listen to the private channel for this chat
+            Echo.private(`chat.${chatId}`)
+                .listen('.message-sent', function(data) {
+                    console.log('Message received:', data);
+                    
                     const chatBox = document.getElementById("chatBox");
-                    const currentUser = "{{ $sernder_name }}"; // your logged-in username
-
+                    
                     // If message comes from OTHER USER → show left side message
-                    if (data.sender_id !== currentUser) {
-
+                    if (data.sender_id !== currentUserId) {
                         chatBox.innerHTML += `
-                    <div class="message-left">
-                        <div class="message-sender">${data.sender_id}:</div>
-                        ${data.message}
-                    </div>
-                `;
+                            <div class="message-left">
+                                <div class="message-sender">${data.sender_id}:</div>
+                                ${data.message}
+                            </div>
+                        `;
                     }
-
+                    
                     // Scroll to bottom
                     chatBox.scrollTop = chatBox.scrollHeight;
+                })
+                .listenForWhisper('typing', (e) => {
+                    console.log('User is typing:', e);
+                    // Show typing indicator
                 });
         };
     </script>

@@ -22,12 +22,12 @@ class UserOnline implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new Channel("private-user.{$this->userId}");
+        return new PrivateChannel("user.{$this->userId}");
     }
 
     public function broadcastAs()
     {
-        return 'client-user_online';
+        return 'user-online';
     }
 }
 
@@ -42,11 +42,11 @@ class UserOffline implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new Channel("private-user.{$this->userId}");
+        return new PrivateChannel("user.{$this->userId}");
     }
 
     public function broadcastAs()
     {
-        return 'client-user_offline';
+        return 'user-offline';
     }
 }

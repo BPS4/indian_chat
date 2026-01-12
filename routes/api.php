@@ -34,33 +34,9 @@ Route::middleware(['session.token'])->group(function () {
     Route::post('/admin-login', [AuthController::class, 'admin_login']);
     Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
 
-    Route::get('dashboard', [HotelController::class, 'dashboard']);
-    Route::get('hotel-location/{name?}', [HotelController::class, 'hotel_location']);
-    // Route::post('hotel-search', [HotelController::class, 'hotel_search']);
-    Route::get('hotel-search', [HotelController::class, 'hotelSearch']);
-    // Route::any('hotel-rooms', [HotelController::class, 'hotelRooms']);
-    Route::any('hotel-rooms', [HotelRoomController::class, 'hotelRooms']);
-    Route::get('room-detail/{hotel_id}/{room_type}', [HotelRoomController::class, 'RoomDetail']);
-    Route::any('hotel-details', [HotelController::class, 'hotelDetails'])->name('hotels.details');
-    Route::any('locality', [HotelController::class, 'locality']);
-    Route::get('hotel-facility/{id}', [HotelController::class, 'hotelFacility'])->name('hotels.facility');
+  
 
-
-    // Coupons
-    Route::get('all-coupons', [CouponsController::class, 'all_coupons']);
-
-    // terms
-    Route::get('/terms', [TermController::class, 'show_terms']);
-    Route::get('/property-rules', [TermController::class, 'propertyRules']);
-
-    // Hotel Offer
-    Route::get('hotel-offer', [HotelController::class, 'hotel_Offer']);
-
-
-
-    Route::post('review-bookings', [BookingController::class, 'reviewBooking']);
-    Route::post('apply-coupon', [BookingController::class, 'applyCoupon']);
-    Route::get('hotel-policy/{id}', [HotelController::class, 'hotelPolicy']);
+   
 });
 Route::middleware(['jwt.auth'])->group(function () {
 
@@ -76,6 +52,9 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('conversations', [ChatController::class, 'myConversations']);
 
     Route::get('conversations-details/{id}', [ChatController::class, 'conversationMessages']);
+    
+    // Admin conversation (default for all users)
+    Route::get('admin-messages', [ChatController::class, 'getAdminConversation']);
 
 
 

@@ -26,6 +26,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\Booking\BookingController;
 use App\Http\Controllers\chatcontroller;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\commisionController;
+use App\Http\Controllers\Admin\LogoController;
 
 
 Route::get('', function () {
@@ -76,6 +78,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         return redirect('admin/dashboard');
     });
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
+    
+    // Admin Chat/Broadcast
+    Route::post('broadcast-message', [\App\Http\Controllers\Admin\AdminChatController::class, 'sendBroadcastMessage'])->name('admin.broadcast');
+    Route::get('admin-messages', [\App\Http\Controllers\Admin\AdminChatController::class, 'getAdminMessages'])->name('admin.messages');
+    Route::get('users-list', [\App\Http\Controllers\Admin\AdminChatController::class, 'getAllUsers'])->name('admin.users.list');
+    Route::get('broadcast', function() {
+        return view('admin.pages.broadcast');
+    })->name('admin.broadcast.view');
 
     // profile
 
@@ -86,22 +96,19 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
 
     });
 
-    // Hotel
+    // Message Management
     Route::prefix('message')->group(function () {
-        Route::get('list', [App\Http\Controllers\Admin\HotelController::class, 'hotel_list'])->name('hotels.list');
-        Route::any('add', [App\Http\Controllers\Admin\HotelController::class, 'store'])->name('message.store');
-        Route::get('edit/{id}', [App\Http\Controllers\Admin\HotelController::class, 'edit'])->name('hotels.edit');
-        Route::put('update/{id}', [App\Http\Controllers\Admin\HotelController::class, 'update'])->name('hotels.update');
-        Route::post('status/{hotel}/toggle-status', [App\Http\Controllers\Admin\HotelController::class, 'toggleStatus']);
-
-        Route::get('/hotel-room/{hotel_id}', [HotelRoomController::class, 'index'])->name('hotel-room.index');
-        Route::get('/hotel-room/{hotel_id}/create', [HotelRoomController::class, 'create'])->name('hotel-room.create');
-        Route::post('/hotel-room/{hotel_id}/store', [HotelRoomController::class, 'store'])->name('hotel-room.store');
-        Route::get('/hotel/{hotelId}/room/{id}/edit', [HotelRoomController::class, 'edit'])->name('hotel-room.edit');
-        Route::put('/hotel/{hotelId}/room/{id}', [HotelRoomController::class, 'update'])->name('hotel-room.update');
-        Route::delete('/hotel/{hotelId}/room/{id}', [HotelRoomController::class, 'destroy'])->name('hotel-room.destroy');
+        Route::get('list', [App\Http\Controllers\Admin\HotelController::class, 'message_list'])->name('message.list');
+        Route::get('add', function() {
+            return view('admin.pages.messages.add');
+        })->name('message.add');
+        Route::post('store', [\App\Http\Controllers\Admin\AdminChatController::class, 'sendBroadcastMessage'])->name('message.store');
+        Route::get('edit/{id}', [App\Http\Controllers\Admin\HotelController::class, 'edit_message'])->name('message.edit');
+        Route::put('update/{id}', [App\Http\Controllers\Admin\HotelController::class, 'update_message'])->name('message.update');
+        Route::delete('delete/{id}', [App\Http\Controllers\Admin\HotelController::class, 'delete_message'])->name('message.delete');
     });
 
+   
     // Customers
     Route::prefix('customers')->group(function () {
         Route::get('list', [CustomerController::class, 'customer_list']);
@@ -163,30 +170,23 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         Route::put('update/{location}', [LocationController::class, 'update'])->name('location.update');
         Route::delete('destroy/{location}', [LocationController::class, 'destroy'])->name('location.destroy');
     });
-    Route::prefix('locality')->group(function () {
-        Route::get('list', [LocalityController::class, 'index'])->name('locality.list');
-        Route::get('add', [LocalityController::class, 'add'])->name('locality.addForm');
-        Route::post('store', [LocalityController::class, 'store'])->name('locality.store');
-        Route::get('edit/{localty}', [LocalityController::class, 'edit'])->name('locality.editForm');
-        Route::put('update/{localty}', [LocalityController::class, 'update'])->name('locality.update');
-        Route::delete('destroy/{localty}', [LocalityController::class, 'destroy'])->name('locality.destroy');
+     Route::prefix('refral_commision')->group(function () {
+        Route::get('list', [commisionController::class, 'refral_commision']);
+        Route::get('add', [commisionController::class, 'add'])->name('commmision.create');
+        Route::post('store', [commisionController::class, 'store'])->name('commision.store');
+       
+        
     });
-    Route::resource('addons', AddOnsController::class);
-    Route::resource('facility', FacilityController::class);
-    Route::post('/facility-group/add', [FacilityGroupController::class, 'store'])->name('facility-group.store');
-    Route::get('/facility-group/list', [FacilityGroupController::class, 'index'])->name('facility-group.list');
-    Route::delete('/facility-group/{id}', [FacilityGroupController::class, 'destroy'])->name('facility-group.destroy');
-    Route::resource('coupons', CouponController::class);
-    Route::resource('gift-card', GiftCardController::class);
-    Route::prefix('reviews')->group(function () {
-        Route::get('list', [ReviewController::class, 'index'])->name('review.list');
-        Route::get('view/{id}', [ReviewController::class, 'show'])->name('review.view');
-        Route::post('reply/{id}', [ReviewController::class, 'reply'])->name('review.reply');
-        Route::post('status/{id}', [ReviewController::class, 'updateStatus'])->name('review.updateStatus');
+
+       Route::prefix('app_logo')->group(function () {
+        Route::get('list', [LogoController::class, 'index'])->name('app_logo.list');
+        Route::get('add', [LogoController::class, 'create'])->name('app_logo.create');
+        Route::post('store', [LogoController::class, 'store'])->name('app_logo.store');
+       
+        
     });
-    Route::resource('slider', SliderController::class);
-    Route::resource('term', TermController::class);
-    Route::resource('guest-photo', GuestPhotoController::class);
+
+
 });
 
 // Payment Gateway

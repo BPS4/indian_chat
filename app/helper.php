@@ -62,6 +62,17 @@ function modulesList()
             'slug' => 'profile',
             'module_name' => 'profile',
         ],
+
+          [
+            'id' => 13,
+            'slug' => 'refral_commision',
+            'module_name' => 'refral_commision',
+        ],
+         [
+            'id' => 14,
+            'slug' => 'app_logo',
+            'module_name' => 'app_logo',
+        ],
        
 
         [

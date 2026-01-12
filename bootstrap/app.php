@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'session.token' => \App\Http\Middleware\SessionToken::class,
             'CheckSession' => \App\Http\Middleware\CheckSession::class,
+            'jwt.auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+            'jwt.refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

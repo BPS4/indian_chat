@@ -26,12 +26,12 @@ class TypingStatus implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new Channel("private-chat.{$this->chatId}");
+        return new PrivateChannel("chat.{$this->chatId}");
     }
 
     public function broadcastAs()
     {
-        return 'client-typing';
+        return 'typing';
     }
 }
 

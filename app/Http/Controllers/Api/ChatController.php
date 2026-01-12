@@ -32,7 +32,7 @@ class ChatController extends Controller
         $senderId = auth()->id();
 
         // dd($request->all());
-        Messagesent::dispatch($request->input('message'), $request->input('sender_name'), $chatId);
+        MessageSent::dispatch($request->input('message'), $request->input('sender_name'), $chatId);
         return ['success' => true];
     }
 
@@ -127,7 +127,7 @@ class ChatController extends Controller
         ]);
 
         // Broadcast event (group or private)
-        // event(new MessageSent($message, $user->id, $chatId));
+        broadcast(new MessageSent($message, $user->id, $conversation->id))->toOthers();
 
         return response()->json([
             'status' => true,
@@ -230,5 +230,35 @@ class ChatController extends Controller
         broadcast(new TypingStatus($chatId, $userId, $isTyping))->toOthers();
 
         return response()->json(['status' => 'Typing status sent']);
+    }
+
+    /**
+     * Get admin conversation - default for all users
+     */
+    public function getAdminConversation(Request $request)
+    {
+        try {
+            // Get all messages from messages table (admin broadcasts)
+            $messages = Message::whereNotNull('description')
+                ->orderBy('created_at', 'desc')
+                ->paginate(50);
+
+            return response()->json([
+                'success' => true,
+                'messages' => $messages,
+                'conversation' => [
+                    'type' => 'admin_broadcast',
+                    'name' => 'Admin Announcements',
+                    'is_admin_conversation' => true
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching admin messages: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

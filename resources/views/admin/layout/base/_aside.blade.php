@@ -272,19 +272,19 @@
                             <ul class="menu-subnav">
                                 <li class="menu-item  menu-item-parent" aria-haspopup="true"><span
                                         class="menu-link"><span class="menu-text">Admin</span></span></li>
-                                @if (isset($existingPermissions['role']) && $existingPermissions['role'] != 0)
-                                    <li class="menu-item  @yield('role')" aria-haspopup="true"
+                                @if (isset($existingPermissions['refral_commision']) && $existingPermissions['refral_commision'] != 0)
+                                    <li class="menu-item  @yield('refral_commision')" aria-haspopup="true"
                                         data-menu-toggle="hover">
-                                        <a href="{{ route('slider.index') }}" class="menu-link menu-toggle">
+                                        <a href="{{ url('/admin/refral_commision/list') }}" class="menu-link menu-toggle">
                                             <i class="menu-bullet menu-bullet-line"><span></span></i>
                                             <span class="menu-text">Refral Commision</span>
                                         </a>
                                     </li>
                                 @endif
-                                @if (isset($existingPermissions['user']) && $existingPermissions['user'] != 0)
-                                    <li class="menu-item  @yield('user')" aria-haspopup="true"
+                                @if (isset($existingPermissions['app_logo']) && $existingPermissions['app_logo'] != 0)
+                                    <li class="menu-item  @yield('app_logo')" aria-haspopup="true"
                                         data-menu-toggle="hover">
-                                        <a href="{{ route('term.index') }}" class="menu-link menu-toggle">
+                                        <a href="{{ route('app_logo.list') }}" class="menu-link menu-toggle">
                                             <i class="menu-bullet menu-bullet-line"><span></span></i>
                                             <span class="menu-text">App Logo</span>
                                         </a>

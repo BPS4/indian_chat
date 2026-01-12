@@ -12,8 +12,8 @@
             </div>
             <div class="card-toolbar">
                 <!--begin::Button-->
-                <a href="{{ url('/admin/bookings/add') }}" class="btn btn-primary font-weight-bolder">
-                    + Quick Booking </a>
+                {{-- <a href="{{ url('/admin/bookings/add') }}" class="btn btn-primary font-weight-bolder">
+                    + Quick Booking </a> --}}
                 <!-- <div>
                                                                                                                                     <img src="{{ asset('media/icons/card-icon.png') }}" alt="">
                                                                                                                                 </div> -->

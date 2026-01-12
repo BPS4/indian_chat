@@ -24,11 +24,11 @@ class MessageSeen implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new Channel("private-user.{$this->receiverId}");
+        return new PrivateChannel("user.{$this->receiverId}");
     }
 
     public function broadcastAs()
     {
-        return 'client-message-seen';
+        return 'message-seen';
     }
 }
