@@ -26,6 +26,8 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->boolean('auto_send')->default(false);
             $table->integer('total_users')->nullable();
+            $table->integer('created_by')->nullable();
+
             $table->timestamps();
         });
     }

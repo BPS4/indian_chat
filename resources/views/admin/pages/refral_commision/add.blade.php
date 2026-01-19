@@ -29,7 +29,7 @@
                                 <div
                                     class="d-flex  gap-3 mt-4">
                                     <button type="submit" class="btn  bg-brown add">Save</button>
-                                    <button type="reset" class="btn bg-gray px-5">Cancel</button>
+                                    <a href="{{ route('commision.index') }}" class="btn bg-gray px-5">Cancel</a>
                                 </div>
                             </div>
                         </div>

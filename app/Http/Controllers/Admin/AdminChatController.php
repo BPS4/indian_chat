@@ -16,104 +16,103 @@ class AdminChatController extends Controller
     /**
      * Send broadcast message to all users
      */
-    public function sendBroadcastMessage(Request $request)
-    {
+   public function sendBroadcastMessage(Request $request)
+{
 
-    // dd('hi');
-        $validated = $request->validate([
-            'description'      => 'required|string|max:5000',
-            'media'            => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov,avi|max:10240',
-            'youtube_link'     => 'nullable|url',
-            'calling_number'   => 'required|string|max:15',
-            'website_link'     => 'nullable|url',
-            'instagram_link'   => 'nullable|url',
-            'facebook_link'    => 'nullable|url',
-            'telegram_link'    => 'nullable|url',
-            'state'            => 'required|string',
-            'city'             => 'nullable|string',
-            'total_users'      => 'nullable|integer',
+    // ✅ Validate request
+    $validated = $request->validate([
+        'description'      => 'required|string|max:5000',
+        'media'            => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov,avi|max:10240',
+        'youtube_link'     => 'nullable|url',
+        'calling_number'   => 'required|string|max:15',
+        'website_link'     => 'nullable|url',
+        'instagram_link'   => 'nullable|url',
+        'facebook_link'    => 'nullable|url',
+        'telegram_link'    => 'nullable|url',
+        'state'            => 'required|string',
+        'city'             => 'nullable|string',
+        'total_users'      => 'nullable|integer',
         ]);
-
+        
+        // ✅ Get admin user
         $admin = auth()->user();
-        
-        // If using session-based auth for admin
-        if (!$admin) {
-            $adminId = session()->get('id');
-            $admin = User::find($adminId);
-        }
 
         if (!$admin) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            // Prepare message data
-            $messageData = [
-                'description'     => $request->description,
-            ];
-
-            // Handle additional fields from hotel controller
-            $additionalData = $request->only([
-                'youtube_link',
-                'calling_number',
-                'website_link',
-                'instagram_link',
-                'facebook_link',
-                'telegram_link',
-                'state',
-                'city',
-                'total_users',
-            ]);
-
-            // Set country default
-            if ($request->filled('state') || $request->filled('city')) {
-                $additionalData['country'] = 'India';
-            }
-
-            // Handle auto_send checkbox
-            $additionalData['auto_send'] = $request->has('auto_send');
-
-            // Handle media file upload
-            if ($request->hasFile('media')) {
-                $additionalData['media'] = $request->file('media')->store('messages', 'public');
-            }
-
-            // Merge all data
-            $messageData = array_merge($messageData, array_filter($additionalData));
-
-            // Save message to database
-            $message = Message::create($messageData);
-
-            DB::commit();
-
-            // Broadcast to all users (non-blocking, continues even if broadcast fails)
-            try {
-                broadcast(new AdminBroadcastMessage(
-                    $request->description,
-                    $admin->id,
-                    $admin->name ?? 'Admin',
-                    $message->id
-                ));
-                $broadcastStatus = 'Message saved and broadcasted successfully!';
-            } catch (\Exception $broadcastError) {
-                Log::warning('Broadcast failed but message saved: ' . $broadcastError->getMessage());
-                $broadcastStatus = 'Message saved successfully! (Broadcasting unavailable - please start Reverb server)';
-            }
-
-            return redirect()->route('message.list')
-                ->with('success', $broadcastStatus);
-        
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Broadcast message error: ' . $e->getMessage());
-            
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Failed to send message: ' . $e->getMessage()]);
-        }
+        $adminId = session()->get('id');
+        $admin = User::find($adminId);
     }
+        // dd($admin->id);
+    if (!$admin) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
+        // ✅ Normalize city
+        $city = $request->city === 'all' ? 'all' : $request->city;
+        
+        DB::beginTransaction();
+        
+        try {
+            // ✅ Base message data
+            $messageData = [
+                'description'   => $request->description,
+                'youtube_link'  => $request->youtube_link,
+                'calling_number'=> $request->calling_number,
+                'website_link'  => $request->website_link,
+                'instagram_link'=> $request->instagram_link,
+                'facebook_link' => $request->facebook_link,
+                'telegram_link' => $request->telegram_link,
+                'state'         => $request->state,
+                'city'          => $request->city,
+                'total_users'   => $request->total_users,
+                'country'       => 'India',
+                'auto_send'     => $request->has('auto_send'),
+                'created_by'    => $admin->id,
+                ];
+                
+                // ✅ Handle media upload (public/messages)
+                if ($request->hasFile('media') && $request->file('media')->isValid()) {
+                    $file = $request->file('media');
+                    $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+                    $file->move(public_path('messages'), $filename);
+                    $messageData['media'] = 'messages/' . $filename;
+                    }
+                    
+                    // ✅ Save message
+                    $message = Message::create($messageData);
+             
+        DB::commit();
+
+        // ✅ Broadcast message
+        try {
+            broadcast(new AdminBroadcastMessage(
+                $message,
+                $admin->id,
+                $admin->name ?? 'Admin',
+                $city
+            ));
+
+            $broadcastStatus = $city === 'all'
+                ? 'Message sent to all users'
+                : "Message sent to users in {$city}";
+        } catch (\Exception $broadcastError) {
+            Log::warning('Broadcast failed: ' . $broadcastError->getMessage());
+            $broadcastStatus = 'Message saved, but broadcasting is currently unavailable.';
+        }
+
+        return redirect()
+            ->route('message.list')
+            ->with('success', $broadcastStatus);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Broadcast message error: ' . $e->getMessage());
+
+        return back()
+            ->withInput()
+            ->withErrors(['error' => 'Failed to send message. Please try again.']);
+    }
+}
+
 
     /**
      * Get admin conversation messages

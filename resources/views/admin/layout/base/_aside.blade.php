@@ -281,7 +281,18 @@
                                         </a>
                                     </li>
                                 @endif
-                                @if (isset($existingPermissions['app_logo']) && $existingPermissions['app_logo'] != 0)
+
+                                   @if (isset($existingPermissions['contact_details']) && $existingPermissions['contact_details'] != 0)
+                                    <li class="menu-item  @yield('contact_details')" aria-haspopup="true"
+                                        data-menu-toggle="hover">
+                                        <a href="{{ url('/admin/contact_details/list') }}" class="menu-link menu-toggle">
+                                            <i class="menu-bullet menu-bullet-line"><span></span></i>
+                                            <span class="menu-text">Contact Details</span>
+                                        </a>
+                                    </li>
+                                @endif
+
+                                {{-- @if (isset($existingPermissions['app_logo']) && $existingPermissions['app_logo'] != 0)
                                     <li class="menu-item  @yield('app_logo')" aria-haspopup="true"
                                         data-menu-toggle="hover">
                                         <a href="{{ route('app_logo.list') }}" class="menu-link menu-toggle">
@@ -289,7 +300,7 @@
                                             <span class="menu-text">App Logo</span>
                                         </a>
                                     </li>
-                                @endif
+                                @endif --}}
                                 {{-- @if (isset($existingPermissions['user']) && $existingPermissions['user'] != 0)
                                     <li class="menu-item  @yield('user')" aria-haspopup="true"
                                         data-menu-toggle="hover">

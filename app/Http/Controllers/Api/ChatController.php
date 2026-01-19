@@ -13,7 +13,9 @@ use App\Events\MessageDelivered;
 use App\Events\MessageSeen;
 use App\Events\TypingStatus;
 use App\Http\Resources\ConversationResource;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -35,6 +37,249 @@ class ChatController extends Controller
         MessageSent::dispatch($request->input('message'), $request->input('sender_name'), $chatId);
         return ['success' => true];
     }
+
+
+    /**
+     * Get all broadcast messages for user's city with read/unread status
+     */
+    public function all_chats(Request $request)
+    {
+        $user = auth()->user();
+        $user_city = $user->city;
+        $user_id = $user->id;
+
+        // Get messages for user's city with read status
+        $chats = DB::table('messages')
+            ->leftJoin('message_reads', function($join) use ($user_id) {
+                $join->on('messages.id', '=', 'message_reads.message_id')
+                     ->where('message_reads.user_id', '=', $user_id);
+            })
+            ->where(function($query) use ($user_city) {
+                $query->where('messages.city', $user_city)
+                      ->orWhere('messages.city', 'all');
+            })
+            ->select(
+                'messages.*',
+                DB::raw('CASE WHEN message_reads.id IS NOT NULL THEN 1 ELSE 0 END as is_read'),
+                'message_reads.read_at'
+            )
+            ->orderBy('messages.created_at', 'desc')
+            ->get();
+
+        // Count unread messages
+        $unread_count = $chats->where('is_read', 0)->count();
+
+        return response()->json([
+            'status' => true,
+            'unread_count' => $unread_count,
+            'messages' => $chats
+        ]);
+    }
+
+    /**
+     * Get only unread messages
+     */
+    public function getUnreadMessages(Request $request)
+    {
+        $user = auth()->user();
+        $user_city = $user->city;
+        $user_id = $user->id;
+
+        $unread = DB::table('messages')
+            ->leftJoin('message_reads', function($join) use ($user_id) {
+                $join->on('messages.id', '=', 'message_reads.message_id')
+                     ->where('message_reads.user_id', '=', $user_id);
+            })
+            ->where(function($query) use ($user_city) {
+                $query->where('messages.city', $user_city)
+                      ->orWhere('messages.city', 'all');
+            })
+            ->whereNull('message_reads.id')
+            ->select('messages.*')
+            ->orderBy('messages.created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'count' => $unread->count(),
+            'messages' => $unread
+        ]);
+    }
+
+    /**
+     * Get unread message count
+     */
+    public function getUnreadCount(Request $request)
+    {
+        $user = auth()->user();
+        $user_city = $user->city;
+        $user_id = $user->id;
+
+        $count = DB::table('messages')
+            ->leftJoin('message_reads', function($join) use ($user_id) {
+                $join->on('messages.id', '=', 'message_reads.message_id')
+                     ->where('message_reads.user_id', '=', $user_id);
+            })
+            ->where(function($query) use ($user_city) {
+                $query->where('messages.city', $user_city)
+                      ->orWhere('messages.city', 'all');
+            })
+            ->whereNull('message_reads.id')
+            ->count();
+
+        return response()->json([
+            'status' => true,
+            'unread_count' => $count
+        ]);
+    }
+
+    /**
+     * Mark a single message as read
+     */
+    public function markAsRead(Request $request, $messageId)
+    {
+        $user_id = auth()->id();
+
+        // Check if message exists
+        $message = Message::find($messageId);
+        
+        if (!$message) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Message not found'
+            ], 404);
+        }
+
+        // Check if already marked as read
+        $existingRead = DB::table('message_reads')
+            ->where('message_id', $messageId)
+            ->where('user_id', $user_id)
+            ->first();
+
+        if ($existingRead) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Message already marked as read'
+            ]);
+        }
+
+        // Mark as read
+        DB::table('message_reads')->insert([
+            'message_id' => $messageId,
+            'user_id' => $user_id,
+            'read_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Message marked as read'
+        ]);
+    }
+
+    /**
+     * Mark all messages as read for current user
+     */
+    public function markAllAsRead(Request $request)
+    {
+        $user = auth()->user();
+        $user_id = $user->id;
+        $user_city = $user->city;
+
+        // Get all unread message IDs for user's city
+        $unreadMessageIds = DB::table('messages')
+            ->leftJoin('message_reads', function($join) use ($user_id) {
+                $join->on('messages.id', '=', 'message_reads.message_id')
+                     ->where('message_reads.user_id', '=', $user_id);
+            })
+            ->where(function($query) use ($user_city) {
+                $query->where('messages.city', $user_city)
+                      ->orWhere('messages.city', 'all');
+            })
+            ->whereNull('message_reads.id')
+            ->pluck('messages.id');
+
+        if ($unreadMessageIds->isEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'No unread messages',
+                'marked_count' => 0
+            ]);
+        }
+
+        // Bulk insert read records
+        $insertData = [];
+        foreach ($unreadMessageIds as $messageId) {
+            $insertData[] = [
+                'message_id' => $messageId,
+                'user_id' => $user_id,
+                'read_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        DB::table('message_reads')->insert($insertData);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'All messages marked as read',
+            'marked_count' => count($insertData)
+        ]);
+    }
+
+    /**
+     * Mark specific messages as read (bulk)
+     */
+    public function markMultipleAsRead(Request $request)
+    {
+        $request->validate([
+            'message_ids' => 'required|array',
+            'message_ids.*' => 'integer|exists:messages,id'
+        ]);
+
+        $user_id = auth()->id();
+        $messageIds = $request->message_ids;
+
+        // Get messages that aren't already read
+        $alreadyRead = DB::table('message_reads')
+            ->where('user_id', $user_id)
+            ->whereIn('message_id', $messageIds)
+            ->pluck('message_id')
+            ->toArray();
+
+        $toMarkAsRead = array_diff($messageIds, $alreadyRead);
+
+        if (empty($toMarkAsRead)) {
+            return response()->json([
+                'status' => true,
+                'message' => 'All specified messages already marked as read',
+                'marked_count' => 0
+            ]);
+        }
+
+        // Bulk insert
+        $insertData = [];
+        foreach ($toMarkAsRead as $messageId) {
+            $insertData[] = [
+                'message_id' => $messageId,
+                'user_id' => $user_id,
+                'read_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+
+        DB::table('message_reads')->insert($insertData);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Messages marked as read',
+            'marked_count' => count($insertData)
+        ]);
+    }
+
 
     public function startPrivateChat(Request $request)
     {
@@ -253,8 +498,8 @@ class ChatController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error fetching admin messages: ' . $e->getMessage());
-            
+            Log::error('Error fetching admin messages: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()

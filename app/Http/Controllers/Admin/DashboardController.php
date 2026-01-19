@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Hotel;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Message;
 
 class DashboardController extends Controller
 {
@@ -25,40 +26,23 @@ class DashboardController extends Controller
             if ($status == '0') {
                 $status = '2';
             }
-            $bookings = bookingAnalytics();
-            $monthlyRevenue = paymentAnalytics();
-            $monthlyRevenueCharts = paymentAnalyticsChart();
-            $bookingChart = bookingAnalyticsChart();
-            $customers = activeCustomerAnalytics();
-            $query = Booking::withCount('guests')
-                ->with(['guests' => function ($query) {
-                    $query->where('is_primary', 1);
-                }, 'rooms.roomType', 'hotel'])
-                ->where('status', 'confirmed')
-                ->whereDate('checkin_date', now());
+      
+            $users = User::whereIn('role_id', [2,12])->get();
+            $customers = $users->count();
 
-            if ($request->filled('hotel_id')) {
-                $query->where('hotel_id', $request->hotel_id);
-            }
+            $totle_admin = User::where('role_id', 12)->get();
+            $admin = $totle_admin->count();
 
-            $upcomingCheckIns = $query->get();
+            $messages = Message::get();
+            $message = $messages->count();
 
-            $query = Booking::withCount('guests')
-                ->with(['guests' => function ($query) {
-                    $query->where('is_primary', 1);
-                }, 'rooms.roomType', 'hotel'])
-                ->where('status', 'confirmed')
-                ->whereDate('checkout_date', now());
+            $city_users = User::whereNotNull('city')->get();
+            $cities = $city_users->pluck('city')->unique();
+            $city = $cities->count();
 
-            if ($request->filled('upcoming_hotel_id')) {
-                $query->where('hotel_id', $request->upcoming_hotel_id);
-            }
-            $upcomingCheckOuts = $query->get();
-            $hotels = Hotel::get();
-            $hotelId = $request->hotel_id;
-            $upcominghotelId = $request->upcoming_hotel_id;
+            // dd($customers,$customers,$admin,$message, $city,);   
 
-            return view('admin.pages.dashboard.list', compact('page_title', 'page_description', 'breadcrumbs', 'bookings', 'monthlyRevenue', 'customers', 'upcomingCheckIns', 'upcomingCheckOuts', 'hotels', 'monthlyRevenueCharts', 'bookingChart', 'hotelId', 'upcominghotelId'));
+            return view('admin.pages.dashboard.list', compact('page_title', 'page_description', 'breadcrumbs', 'customers', 'admin', 'message', 'city'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

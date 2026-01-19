@@ -15,6 +15,9 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\Wallet;
+use Illuminate\Support\Facades\DB;
+use App\Models\Commision;
 
 class AuthController extends Controller
 {
@@ -46,10 +49,11 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'mobile' => 'required|digits:10',
+            'referral_code' => 'nullable|exists:users,referral_code',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'Invalid mobile number'], 422);
+            return response()->json(['message' => 'Invalid mobile number or referral id'], 422);
         }
 
         $mobileNumber = $request->input('mobile');
@@ -58,7 +62,18 @@ class AuthController extends Controller
 
 
 
+        $sponsor = null;
+
+        if ($request->filled('referral_code')) {
+            $sponsor = User::where('referral_code', $request->referral_code)->first();
+        } else {
+            $sponsor = User::where('role_id', 1)->first();
+        }
+
+
+        // dd($sponsor);
         $response = Helper::sendOtpToPhone($mobileNumber, $otp);
+        // dd($response);
         if ($response['success']) {
             $user = User::where('mobile', $mobileNumber)->first();
 
@@ -69,8 +84,18 @@ class AuthController extends Controller
                     'email'  => null,
                     'role_id'  => User::CUSTOMER,
                     'password' => bcrypt(Str::random(10)),
+                    'referral_code' => generateReferralCode(),
+                    'referred_by' => $sponsor?->id,
+                ]);
+
+                Wallet::create([
+                    'user_id' => $user->id,
+                    'balance' => 0,
                 ]);
             }
+
+            // dd('hi');
+
             UserAuth::updateOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -92,32 +117,35 @@ class AuthController extends Controller
         try {
             // Validate input
             $validator = Validator::make($request->all(), [
-                'login' => 'required',
-                'otp' => 'required|digits:4',
+                'mobile' => 'required',
+                'otp'   => 'required|digits:4',
             ]);
 
             if ($validator->fails()) {
                 return response()->json(['message' => $validator->errors()->first()], 422);
             }
 
-            $login = $request->input('login');
-            $otp = $request->input('otp');
+            $login = $request->input('mobile');
+            $otp   = $request->input('otp');
 
             // Determine if login is mobile or email
             if (is_numeric($login) && strlen($login) === 10) {
-                $user = User::where('mobile', $login)->first();
+                $user = User::where('mobile', $login)->where('status', 1)->first();
             } elseif (filter_var($login, FILTER_VALIDATE_EMAIL)) {
-                $user = User::where('email', $login)->first();
+                $user = User::where('email', $login)->where('status', 1)->first();
             } else {
-                return response()->json(['message' => 'Invalid login format. Use 10-digit mobile or valid email'], 422);
+                return response()->json(['message' => 'Invalid login format'], 422);
             }
 
             if (!$user) {
                 return response()->json(['message' => 'User not found'], 404);
             }
-            if ($user->status == 0) {
-                return response()->json(['message' => 'Account is blocked/deleted. Please contact to admin'], 401);
-            }
+
+            // dd($user);
+            // if ($user->status == 0) {
+            //     return response()->json(['message' => 'Account is blocked/deleted'], 401);
+            // }
+
             // Check OTP
             $auth = UserAuth::where('user_id', $user->id)
                 ->where('otp', $otp)
@@ -129,25 +157,60 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Invalid or expired OTP'], 400);
             }
 
-            // Mark OTP as used
-            $auth->is_verified = true;
-            $auth->save();
 
+
+
+            // dd($refral_commision, $joining_bonus);
+
+
+            DB::transaction(function () use ($auth, $user) {
+
+                $refral_commision = Commision::select('referral_commision')->first();
+                $joining_bonus = Commision::select('joining_bonus')->first();
+
+                // Mark OTP as verified
+                $auth->update(['is_verified' => true]);
+
+                // Create wallet if not exists
+                $wallet = Wallet::firstOrCreate(
+                    ['user_id' => $user->id],
+                    ['balance' => 0]
+                );
+
+
+
+                // 🔒 Apply bonus ONLY ON FIRST VERIFICATION
+                if ($wallet->balance == 0) {
+
+                    // Joining bonus
+                    $wallet->increment('balance', $joining_bonus->joining_bonus);
+
+                    // Referral bonus to sponsor
+                    if ($user->referred_by) {
+                        Wallet::firstOrCreate(
+                            ['user_id' => $user->referred_by],
+                            ['balance' => 0]
+                        )->increment('balance', $refral_commision->referral_commision);
+                    }
+                }
+            });
+            // dd('hi');
 
             Auth::login($user);
 
-            // $token = $user->createToken('mobile-login')->plainTextToken;
-            $accessToken  = JWTAuth::fromUser($user);
+            $accessToken = JWTAuth::fromUser($user);
 
             return response()->json([
                 'message' => 'OTP verified successfully',
-                // 'hash' => $auth->hash,
                 'access_token' => $accessToken,
-                'user' => $user,
+                'user' => $user->load('wallet'),
             ]);
         } catch (\Exception $e) {
-            Log::error(['message' => $e->getMessage()]);
-            return response(['message' => 'something went wrong', 'error' => $e->getMessage()], 500);
+            Log::error(['verifyOtp_error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -175,33 +238,32 @@ class AuthController extends Controller
     }
 
 
-   public function admin_login(Request $request)
-{
-    // Validate input
-    $request->validate([
-        'email' => 'required|email',
-    ]);
+    public function admin_login(Request $request)
+    {
+        // Validate input
+        $request->validate([
+            'email' => 'required|email',
+        ]);
 
-    // Get admin user
-    $user = User::where('email', $request->email)
-                ->where('role_id', 1)
-                ->first();
+        // Get admin user
+        $user = User::where('email', $request->email)
+            ->where('role_id', 1)
+            ->first();
 
-    if (!$user) {
-        return response()->json(['error' => 'Unauthorized'], 401);
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        // Log the user in (without password)
+        Auth::login($user);
+
+        // Generate JWT token
+        $token = JWTAuth::fromUser($user);
+
+        return response()->json([
+            'message' => 'Admin login successful',
+            'token'   => $token,
+            'user'    => $user
+        ]);
     }
-
-    // Log the user in (without password)
-    Auth::login($user);
-
-    // Generate JWT token
-    $token = JWTAuth::fromUser($user);
-
-    return response()->json([
-        'message' => 'Admin login successful',
-        'token'   => $token,
-        'user'    => $user
-    ]);
-}
-
 }

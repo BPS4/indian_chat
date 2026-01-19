@@ -42,7 +42,7 @@
                                 <th>Refral Commision</th>
                                
                                 <th>Status</th>
-                                <th class="text-center">Action</th>
+                                <th >Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,14 +57,14 @@
 
 
 
-                                            {{-- <td>
+                                            <td>
                                                 
                                                 <a href="{{ route('commision.edit', $commision->id) }}"
                                                     class="btn btn-sm text-primary border-0" data-bs-toggle="tooltip"
                                                     title="Edit">
                                                     <i class="la la-edit"></i>
                                                 </a>
-                                                <form action="{{ route('commision.destroy', $commision->id) }}" method="POST"
+                                                {{-- <form action="{{ route('commision.destroy', $commision->id) }}" method="POST"
                                                     style="display:inline;"
                                                     onsubmit="return confirm('Are you sure you want to delete this slider?');">
                                                     @csrf
@@ -73,9 +73,9 @@
                                                         data-bs-toggle="tooltip" title="Delete">
                                                         <i class="la la-trash"></i>
                                                     </button>
-                                                </form>
+                                                </form> --}}
 
-                                            </td> --}}
+                                            </td>
                                         </tr>
                                     @endforeach
 

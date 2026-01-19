@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\Booking\BookingController;
 use App\Http\Controllers\chatcontroller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\commisionController;
+use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\LogoController;
 
 
@@ -78,12 +79,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         return redirect('admin/dashboard');
     });
     Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');
-    
+
     // Admin Chat/Broadcast
     Route::post('broadcast-message', [\App\Http\Controllers\Admin\AdminChatController::class, 'sendBroadcastMessage'])->name('admin.broadcast');
     Route::get('admin-messages', [\App\Http\Controllers\Admin\AdminChatController::class, 'getAdminMessages'])->name('admin.messages');
     Route::get('users-list', [\App\Http\Controllers\Admin\AdminChatController::class, 'getAllUsers'])->name('admin.users.list');
-    Route::get('broadcast', function() {
+    Route::get('users/count', [\App\Http\Controllers\Admin\AdminChatController::class, 'getUserCountByCity'])->name('admin.users.count');
+    Route::get('broadcast-stats', [\App\Http\Controllers\Admin\AdminChatController::class, 'getBroadcastStats'])->name('admin.broadcast.stats');
+    Route::get('broadcast', function () {
         return view('admin.pages.broadcast');
     })->name('admin.broadcast.view');
 
@@ -93,22 +96,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         Route::any('user/profile', [App\Http\Controllers\Admin\ProfileController::class, 'profile'])->name('profile');
         Route::any('user/profile/upload', [App\Http\Controllers\Admin\ProfileController::class, 'upload'])->name('profile.upload');
         Route::post('change-password', [AuthController::class, 'changePassword'])->name('admin.password.change');
-
     });
 
     // Message Management
     Route::prefix('message')->group(function () {
         Route::get('list', [App\Http\Controllers\Admin\HotelController::class, 'message_list'])->name('message.list');
-        Route::get('add', function() {
-            return view('admin.pages.messages.add');
-        })->name('message.add');
+        Route::get('add', [App\Http\Controllers\Admin\HotelController::class, 'add_message']);
+
+
         Route::post('store', [\App\Http\Controllers\Admin\AdminChatController::class, 'sendBroadcastMessage'])->name('message.store');
         Route::get('edit/{id}', [App\Http\Controllers\Admin\HotelController::class, 'edit_message'])->name('message.edit');
         Route::put('update/{id}', [App\Http\Controllers\Admin\HotelController::class, 'update_message'])->name('message.update');
         Route::delete('delete/{id}', [App\Http\Controllers\Admin\HotelController::class, 'delete_message'])->name('message.delete');
     });
 
-   
+
     // Customers
     Route::prefix('customers')->group(function () {
         Route::get('list', [CustomerController::class, 'customer_list']);
@@ -127,8 +129,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         Route::get('add', [AdminBookingController::class, 'add_booking']);
         Route::post('status/{booking}', [AdminBookingController::class, 'updateStatus']);
         Route::get('/booking_details/{id}', [AdminBookingController::class, 'show'])
-     ->name('booking.show');
-
+            ->name('booking.show');
     });
 
     // Offers
@@ -141,7 +142,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
     Route::prefix('Payments')->group(function () {
         Route::get('list', [PaymentController::class, 'Payments_list']);
         Route::get('/payment-receipt-download/{id}', [PaymentController::class, 'payment_receipt_download']);
-
     });
 
     Route::prefix('role')->group(function () {
@@ -170,23 +170,35 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         Route::put('update/{location}', [LocationController::class, 'update'])->name('location.update');
         Route::delete('destroy/{location}', [LocationController::class, 'destroy'])->name('location.destroy');
     });
-     Route::prefix('refral_commision')->group(function () {
-        Route::get('list', [commisionController::class, 'refral_commision']);
+
+    Route::prefix('refral_commision')->group(function () {
+        Route::get('list', [commisionController::class, 'refral_commision'])->name('commision.index');
         Route::get('add', [commisionController::class, 'add'])->name('commmision.create');
+        Route::get('edit/{id}', [CommisionController::class, 'edit'])
+            ->name('commision.edit');
+        Route::put('update/{id}', [CommisionController::class, 'update'])
+            ->name('commision.update');
+
         Route::post('store', [commisionController::class, 'store'])->name('commision.store');
-       
-        
     });
 
-       Route::prefix('app_logo')->group(function () {
+
+
+   Route::prefix('contact_details')->group(function () {
+        Route::get('list', [ContactController::class, 'list'])->name('contacts.index');
+        Route::any('add', [ContactController::class, 'add'])->name('contacts.create');
+
+     
+    });
+
+
+
+
+    Route::prefix('app_logo')->group(function () {
         Route::get('list', [LogoController::class, 'index'])->name('app_logo.list');
         Route::get('add', [LogoController::class, 'create'])->name('app_logo.create');
         Route::post('store', [LogoController::class, 'store'])->name('app_logo.store');
-       
-        
     });
-
-
 });
 
 // Payment Gateway

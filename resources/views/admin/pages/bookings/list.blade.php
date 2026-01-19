@@ -122,7 +122,7 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                {{-- <tbody>
                     @php $counter = ($bookings->currentPage() - 1) * $bookings->perPage() + 1; @endphp
                     @forelse($bookings as $booking)
                     <tr>
@@ -149,14 +149,12 @@
                             @endphp
 
                             @if ($method === 'Cash')
-                            {{-- Clickable badge (user can change status) --}}
                             <span class="badge {{ $badgeClass }}" style="cursor: pointer;"
                                 data-booking-id="{{ $booking->id }}"
                                 data-current-status="{{ $booking->status }}" onclick="showBookingSelect(this)">
                                 {{ ucfirst($booking->status) }}
                             </span>
                             @else
-                            {{-- Non-clickable badge --}}
                             <span class="badge {{ $badgeClass }}" style="cursor: not-allowed; opacity: 0.6;">
                                 {{ ucfirst($booking->status) }}
                             </span>
@@ -171,7 +169,6 @@
                         <td>
                             <a href="{{ url('/admin/bookings/booking_details', $booking->id) }}"
                                 class="btn btn-sm text-primary border-0" data-bs-toggle="tooltip" title="Edit">
-                                {{-- <i class="la la-edit"></i> --}}
                                 <i class="la la-eye"></i>
                             </a>
 
@@ -182,7 +179,7 @@
                         <td colspan="8" class="text-center">No bookings found</td>
                     </tr>
                     @endforelse
-                </tbody>
+                </tbody> --}}
             </table>
 
             {{-- Pagination Links --}}

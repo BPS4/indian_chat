@@ -138,6 +138,7 @@
                                     <img src="{{ asset('media/users/customer-ico.png') }}" alt="image" />
                                 </td>
                                 <td>
+                                    {{ $user->user_id }}
                                 </td>
 
                                 <td>
@@ -146,7 +147,7 @@
                                 <td>
                                     <div>
                                         <div class="font-weight-bold">{{ $user->email }}</div>
-                                        <div class="text-muted">{{ $user->mobile }}</div>
+                                        <div class="font-weight-bold">{{ $user->mobile }}</div>
                                     </div>
                                 </td>
                                 <td>{{ $user->country ?? 'N/A' }}</td>

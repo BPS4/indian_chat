@@ -12,8 +12,7 @@ class ProfileController extends Controller
 {
     public function profile()
     {
-        $user = Auth::user();
-
+        $user = Auth::user()->load('wallet', 'sponsor');
         return response(['message' => 'Profile fetch successlly !', 'user' => $user]);
     }
 
@@ -51,17 +50,25 @@ class ProfileController extends Controller
 
 
         // ✅ Profile Picture Upload
-        if ($request->hasFile('profile_pic')) {
+       if ($request->hasFile('profile_pic') && $request->file('profile_pic')->isValid()) {
 
-            // Delete old image if exists
-            if ($user->profile_pic && Storage::disk('public')->exists($user->profile_pic)) {
-                Storage::disk('public')->delete($user->profile_pic);
-            }
+    // Delete old image from PUBLIC folder
+    if ($user->profile_pic && file_exists(public_path($user->profile_pic))) {
+        unlink(public_path($user->profile_pic));
+    }
 
-            // Store new image
-            $path = $request->file('profile_pic')->store('profile_pics', 'public');
-            $user->profile_pic = $path;
-        }
+    $file = $request->file('profile_pic');
+
+    // Clean & unique filename
+    $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+
+    // Move to public/profile_pics
+    $file->move(public_path('profile_pics'), $filename);
+
+    // Save relative path in DB
+    $user->profile_pic = 'profile_pics/' . $filename;
+}
+
 
 
 

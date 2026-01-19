@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('user_id')->nullable();
             $table->string('name')->nullable();
-
-
             $table->string('profile_pic')->nullable();
             $table->integer('role_id');
             $table->date('dob')->nullable();
@@ -33,6 +32,11 @@ return new class extends Migration
             $table->rememberToken();
             $table->tinyInteger('status')->default(1);
 
+                $table->string('referral_code')->unique()->nullable();
+        $table->unsignedBigInteger('referred_by')->nullable();
+
+        $table->foreign('referred_by')->references('id')->on('users')->nullOnDelete();
+        
             $table->timestamps();
         });
 

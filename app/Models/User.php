@@ -8,6 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\message;
+use Illuminate\Support\Facades\DB;
+
 
 // use App\modal\Booking;
 
@@ -22,9 +25,10 @@ class User extends Authenticatable implements JWTSubject
      * @var list<string>
      */
     protected $fillable = [
+        'user_id',
         'name',
         'email',
-         'country',
+        'country',
         'state',
         'city',
         'country_code',
@@ -33,10 +37,47 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'wallet_amount',
         'profile_pic',
+        'referral_code',
+        'referred_by',
         'status',
     ];
 
-    const CUSTOMER = 2;
+     const CUSTOMER = 2;
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+
+            if (!empty($user->user_id)) {
+                return;
+            }
+
+            $lastNumber = DB::table('users')
+                ->selectRaw("CAST(SUBSTRING(user_id, 5) AS UNSIGNED) as num")
+                ->where('user_id', 'like', 'ind_%')
+                ->orderByDesc('num')
+                ->value('num');
+
+            $nextNumber = ($lastNumber ?? 0) + 1;
+
+            $user->user_id = 'ind_' . str_pad($nextNumber, 7, '0', STR_PAD_LEFT);
+        });
+    }
+
+public function sponsor()
+{
+    return $this->belongsTo(User::class, 'referred_by', 'id');
+}
+
+protected $appends = ['sponser_id'];
+
+public function getSponserIdAttribute()
+{
+    return $this->sponsor?->referral_code;
+}
+
+
+    
 
     /**
      * The attributes that should be hidden for serialization.
@@ -77,33 +118,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class, 'user_id', 'id');
-    }
-
-        public function booking_payments()
-    {
-        return $this->hasManyThrough(
-            BookingPayment::class, // final model
-            Booking::class,        // intermediate model
-            'user_id',             // foreign key on Booking table
-            'booking_id',          // foreign key on BookingPayment table
-            'id',                  // local key on User table
-            'booking_id'                   // local key on Booking table
-        );
-    }
-
-     public function payments()
-    {
-        return $this->hasMany(BookingPayment::class, 'booking_id', 'booking_id');
-    }
-
-    public function rooms()
-    {
-        return $this->hasMany(BookingRoom::class, 'booking_id', 'booking_id');
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -112,20 +126,17 @@ class User extends Authenticatable implements JWTSubject
 
 
     public function conversations()
-{
-    return $this->belongsToMany(Conversation::class)
-                ->withPivot('is_admin')
-                ->withTimestamps();
-}
+    {
+        return $this->belongsToMany(Conversation::class)
+            ->withPivot('is_admin')
+            ->withTimestamps();
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
 
 
-
-
-
-
-
-
-
-
-
+    
 }

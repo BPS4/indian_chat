@@ -13,6 +13,7 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 class HotelController extends Controller
@@ -29,7 +30,8 @@ class HotelController extends Controller
                 ],
             ];
 
-            $messages = Message::when($request->search, function ($query, $search) {
+            $messages = Message::with('user')
+            ->when($request->search, function ($query, $search) {
                 $query->where('message', 'LIKE', "%{$search}%")
                     ->orWhere('state', 'LIKE', "%{$search}%")
                     ->orWhere('city', 'LIKE', "%{$search}%")
@@ -41,21 +43,41 @@ class HotelController extends Controller
                 ->when($request->city, function ($query, $city) {
                     $query->where('city', $city);
                 })
-                ->orderBy('id', 'DESC')
-                ->paginate(25)
-                ->withQueryString();
+                  ->orderBy('id', 'desc')
+                ->paginate(25);
 
-            return view('admin.pages.hotels.list', compact('page_title', 'page_description', 'breadcrumbs', 'messages'));
+            return view('admin.pages.messages.list', compact('page_title', 'page_description', 'breadcrumbs', 'messages'));
         } catch (\Exception $e) {
             Log::error('Message list error: ' . $e->getMessage());
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
+    public function add_message()
+    {
+        $page_title = 'Add Message';
+        $page_description = '';
+        $breadcrumbs = [
+            [
+                'title' => 'Add Message',
+                'url' => '',
+            ],
+        ];
+
+        $city = User::select('city')
+            ->whereNotNull('city')
+            ->where('city', '!=', '')
+            ->distinct()
+            ->orderBy('city')
+            ->get();
+
+        return view('admin.pages.messages.add', compact('page_title', 'page_description', 'breadcrumbs', 'city'));
+    }
+
     public function edit_message($id)
     {
 
-  
+
         try {
             $page_title = 'Edit Message';
             $page_description = '';
@@ -67,15 +89,40 @@ class HotelController extends Controller
             ];
 
             $message = Message::findOrFail($id);
-            
+
             $states = [
-                'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-                'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
-                'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
-                'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
-                'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-                'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi',
-                'Jammu and Kashmir', 'Ladakh', 'Puducherry'
+                'Andhra Pradesh',
+                'Arunachal Pradesh',
+                'Assam',
+                'Bihar',
+                'Chhattisgarh',
+                'Goa',
+                'Gujarat',
+                'Haryana',
+                'Himachal Pradesh',
+                'Jharkhand',
+                'Karnataka',
+                'Kerala',
+                'Madhya Pradesh',
+                'Maharashtra',
+                'Manipur',
+                'Meghalaya',
+                'Mizoram',
+                'Nagaland',
+                'Odisha',
+                'Punjab',
+                'Rajasthan',
+                'Sikkim',
+                'Tamil Nadu',
+                'Telangana',
+                'Tripura',
+                'Uttar Pradesh',
+                'Uttarakhand',
+                'West Bengal',
+                'Delhi',
+                'Jammu and Kashmir',
+                'Ladakh',
+                'Puducherry'
             ];
 
             return view('admin.pages.hotels.edit', compact('page_title', 'page_description', 'breadcrumbs', 'message', 'states'));
@@ -106,11 +153,18 @@ class HotelController extends Controller
             $message = Message::findOrFail($id);
 
             $data = $request->only([
-                'youtube_link', 'description', 'calling_number',
-                'website_link', 'instagram_link', 'facebook_link',
-                'telegram_link', 'state', 'city', 'total_users',
+                'youtube_link',
+                'description',
+                'calling_number',
+                'website_link',
+                'instagram_link',
+                'facebook_link',
+                'telegram_link',
+                'state',
+                'city',
+                'total_users',
             ]);
-            
+
             $data['country'] = 'India';
             $data['auto_send'] = $request->has('auto_send');
             $data['message'] = $request->description;
@@ -139,12 +193,12 @@ class HotelController extends Controller
     {
         try {
             $message = Message::findOrFail($id);
-            
+
             // Delete media file if exists
             if ($message->media && \Storage::disk('public')->exists($message->media)) {
                 \Storage::disk('public')->delete($message->media);
             }
-            
+
             $message->delete();
 
             return response()->json([
@@ -160,52 +214,14 @@ class HotelController extends Controller
         }
     }
 
-    public function hotel_list(Request $request)
-    {
-        try {
-            $page_title = 'Hotels List';
-            $page_description = '';
-            $breadcrumbs = [
-                [
-                    'title' => 'Hotel_list',
-                    'url' => '',
-                ],
-            ];
-
-            $hotels = Hotel::when($request->search, function ($query, $search) {
-                $query->where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('id', $search);
-            })
-                ->when($request->status, function ($query, $status) {
-                    if ($status === 'Active') {
-                        $query->where('status', 'active');
-                    } elseif ($status === 'Maintenance') {
-                        $query->where('status', 'inactive');
-                    }
-                })
-                ->when($request->location, function ($query, $location) {
-                    $query->whereHas('location', function ($q) use ($location) {
-                        $q->where('city', $location);
-                    });
-                })
-                ->orderBy('id', 'DESC')
-                ->paginate(25)
-                ->withQueryString();
-
-            return view('admin.pages.hotels.list', compact('page_title', 'page_description', 'breadcrumbs', 'hotels'));
-        } catch (\Exception $e) {
-            Log::error('Hotel list error: ' . $e->getMessage());
-            return redirect()->back()->with('error', $e->getMessage());
-        }
-    }
+    
 
 
     public function store(Request $request)
     {
         try {
 
-dd('hi');
-    
+
             // =========================
             // POST REQUEST → SAVE DATA
             // =========================
@@ -256,7 +272,7 @@ dd('hi');
                 return redirect()->back()->with('success', 'Message send successfully');
             }
 
-     
+
             $states = [
                 'Andhra Pradesh',
                 'Arunachal Pradesh',

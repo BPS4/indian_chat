@@ -63,3 +63,15 @@ Broadcast::channel('user.{userId}', function ($user, $userId) {
 
     return $authorized;
 });
+
+
+
+Broadcast::channel('city.{city}', function ($user, $city) {
+    return strtolower($user->city) === strtolower($city);
+});
+
+
+Broadcast::channel('admin-broadcast', function ($user) {
+    // Only allow if user is authenticated
+    return isset($user->id);
+});

@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ContactsController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Admin\ContactController;
+
 
 use Illuminate\Support\Facades\Broadcast;
 
@@ -43,6 +45,11 @@ Route::middleware(['jwt.auth'])->group(function () {
 
     Route::post('get-contacts', [ContactsController::class, 'get_contacts']);
 
+    Route::get('/all-chats', [ChatController::class, 'all_chats']);
+
+    Route::get('/contact_details', [ContactController::class, 'contact_details']);
+    Route::get('/total_users', [ContactController::class, 'total_users']);
+
     Route::post('/send-message', [ChatController::class, 'send_message']);
 
     Route::post('/chat/private', [ChatController::class, 'startPrivateChat']);
@@ -56,6 +63,13 @@ Route::middleware(['jwt.auth'])->group(function () {
     // Admin conversation (default for all users)
     Route::get('admin-messages', [ChatController::class, 'getAdminConversation']);
 
+    // Message Read/Unread Functionality
+    Route::get('messages/unread', [ChatController::class, 'getUnreadMessages']);
+    Route::get('messages/unread-count', [ChatController::class, 'getUnreadCount']);
+    Route::post('messages/{messageId}/mark-read', [ChatController::class, 'markAsRead']);
+    Route::post('messages/mark-all-read', [ChatController::class, 'markAllAsRead']);
+    Route::post('messages/mark-multiple-read', [ChatController::class, 'markMultipleAsRead']);
+
 
 
 
@@ -66,19 +80,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('update-profile', [ProfileController::class, 'updateProfile']);
 
 
-    Route::post('create-order', [BookingController::class, 'store']);
+    
 
-    Route::get('all-bookings', [BookingController::class, 'all_bookings']);
-    Route::get('booking-details/{id}', [BookingController::class, 'booking_details']);
-
-    Route::get('cancel-bookings/{id}', [BookingController::class, 'cancel_booking']);
-    Route::get('cancel-bookings-details/{id}', [BookingController::class, 'cancel_bookings_details']);
-
-
-    // All Transactions
-    Route::get('all-transactions', [BookingController::class, 'all_transactions']);
-    // Add Review
-    Route::post('add-review', [ReviewController::class, 'add_review']);
 });
 
 // Review

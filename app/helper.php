@@ -5,6 +5,7 @@
 use App\Models\BookingRoom;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 // class Helper
 // {
@@ -95,9 +96,24 @@ function modulesList()
             'slug' => 'settings',
             'module_name' => 'Settings',
         ],
+         [
+            'id' => 26,
+            'slug' => 'contact_details',
+            'module_name' => 'Contact Details',
+        ],
 
 
     ];
+}
+
+
+function generateReferralCode()
+{
+    do {
+        $code = strtoupper(Str::random(8));
+    } while (\App\Models\User::where('referral_code', $code)->exists());
+
+    return $code;
 }
 
 

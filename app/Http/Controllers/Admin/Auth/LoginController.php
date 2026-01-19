@@ -55,7 +55,7 @@ class LoginController extends Controller
      public function main()
     {
  
-        return view('admin.auth.index');
+        return view('index');
     }
 
     public function index()

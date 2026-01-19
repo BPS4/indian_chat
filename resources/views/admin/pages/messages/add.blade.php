@@ -174,49 +174,45 @@
                                     </div>
 
                                     {{-- City --}}
-                                    <div class="form-group col-md-6">
-                                        <label class="fw-bold">City</label>
-                                        <input type="text" name="city"
-                                               class="form-control @error('city') is-invalid @enderror"
-                                               value="{{ old('city') }}"
-                                               placeholder="Enter city name">
-                                        @error('city')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                   <div class="form-group col-md-6">
+    <label class="fw-bold">City <span class="text-danger">*</span></label>
+    <select name="city"
+            class="form-control @error('city') is-invalid @enderror"
+           >
+        <option value="all">All City</option>
 
-                                    {{-- Auto Send --}}
-                                    <div class="form-group col-md-6 mt-2">
-                                        <div class="form-check">
-                                            <input type="checkbox" name="auto_send"
-                                                   class="form-check-input"
-                                                   value="1" {{ old('auto_send') ? 'checked' : '' }}>
-                                            <label class="form-check-label fw-bold">
-                                                Automatically send this message
-                                            </label>
-                                        </div>
-                                    </div>
+        @foreach($city as $li)
+            <option value="{{ $li->city }}"
+                {{ old('city') == $li->city ? 'selected' : '' }}>
+                {{ $li->city }}
+            </option>
+        @endforeach
+    </select>
 
-                                    {{-- Total Users --}}
-                                    <div class="form-group col-md-6 mt-2">
-                                        <label class="fw-bold">Total Users</label>
-                                        <input type="number" name="total_users"
-                                               class="form-control @error('total_users') is-invalid @enderror"
-                                               value="{{ old('total_users') }}"
-                                               placeholder="0"
-                                               min="0">
-                                        @error('total_users')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+    @error('city')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
+                                 
+
+                                  
 
                                 </div>
 
                                 {{-- Buttons --}}
-                                <div class="text-end mt-4">
+                                {{-- <div class="text-end mt-4">
                                     <a href="{{ route('message.list') }}" class="btn btn-outline-secondary">Cancel</a>
                                     <button type="submit" class="btn btn-success">Send Message</button>
+                                </div> --}}
+
+
+                                 <div
+                                    class="d-flex  gap-3 mt-4">
+                                    <button type="submit" class="btn  bg-brown add">Send Message</button>
+                                    <button type="reset" class="btn bg-gray px-5">Cancel</button>
                                 </div>
+
 
                             </div>
                         </form>
