@@ -16,7 +16,23 @@
             @endif
 
             {{-- Header Menu --}}
-            <div class="header-menu-wrapper header-menu-wrapper-left w-100" id="kt_header_menu_wrapper">
+            <div class="header-mesnu-wrapper header-menu-wrapper-left w-100" id="kt_header_menu_wrapper">
+                <!-- Header sidebar toggles: mobile-only and desktop-only versions -->
+                <button class="btn btn-icon btn-sm me-3 align-items-center d-lg-none" data-aside-toggle aria-label="Toggle sidebar (mobile)">
+                    {{-- <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect y="4" width="24" height="2" rx="1" fill="currentColor"/>
+                        <rect y="11" width="24" height="2" rx="1" fill="currentColor"/>
+                        <rect y="18" width="24" height="2" rx="1" fill="currentColor"/>
+                    </svg> --}}
+                </button>
+
+                <button class="btn btn-icon btn-sm me-3 align-items-center d-none d-lg-inline-flex" data-aside-toggle aria-label="Toggle sidebar (desktop)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect y="4" width="24" height="2" rx="1" fill="currentColor"/>
+                        <rect y="11" width="24" height="2" rx="1" fill="currentColor"/>
+                        <rect y="18" width="24" height="2" rx="1" fill="currentColor"/>
+                    </svg>
+                </button>
                 <form action="{{ url('/admin/search/common-search') }}" method="GET">
                     <div class="w-75 position-relative">
                         <i

@@ -30,9 +30,7 @@
     </div>
     <div class="d-flex align-items-center">
 
-        @if (config('layout.aside.self.display'))
-            <button class="btn p-0 burger-icon burger-icon-left" id="kt_aside_mobile_toggle"><span></span></button>
-        @endif
+        <!-- Mobile aside toggle moved to topbar next to profile -->
 
         {{-- @if (config('layout.header.menu.self.display'))
             <button class="btn p-0 burger-icon ml-4" id="kt_header_mobile_toggle"><span></span></button>

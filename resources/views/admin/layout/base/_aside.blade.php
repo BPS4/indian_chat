@@ -30,6 +30,8 @@
             </button>
         @endif
 
+        <!-- Mobile toggle: header-mobile provides the button with id `kt_aside_mobile_toggle` -->
+
     </div>
 
     {{-- Aside menu --}}
@@ -362,3 +364,124 @@
     </div>
 
 </div>
+<!-- Mobile overlay (click to close) -->
+<div id="kt_aside_overlay" class="aside-overlay d-none"></div>
+
+<!-- Small responsive styles & toggle script -->
+<style>
+    @media (max-width: 991.98px) {
+        /* Force the aside fully off-canvas on small screens */
+        #kt_aside {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            width: 260px !important;
+            transform: translateX(-100%) !important;
+            transition: transform .25s ease-in-out !important;
+            z-index: 1050 !important;
+            background: #fff !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        #kt_aside.mobile-open {
+            transform: translateX(0) !important;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.15) !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+
+        /* When aside is closed ensure page wrapper doesn't reserve space */
+        body:not(.aside-mobile-open) .page,
+        body:not(.aside-mobile-open) #kt_wrapper,
+        body:not(.aside-mobile-open) .wrapper,
+        body:not(.aside-mobile-open) #kt_content {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }
+
+        /* Force aside completely off canvas to avoid any visible strip */
+        body:not(.aside-mobile-open) #kt_aside {
+            transform: translateX(-120%) !important;
+            left: -9999px !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            box-shadow: none !important;
+            border-right: none !important;
+        }
+
+        /* Hide the old minimize toggle on small screens (right icon) */
+        #kt_aside_toggle { display: none !important; }
+
+        /* overlay shown when aside open (toggled via .active class) */
+        #kt_aside_overlay {
+            display: block;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1040;
+            opacity: 0;
+            transition: opacity .2s ease-in-out;
+            pointer-events: none;
+        }
+
+        #kt_aside_overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* hide large-brand text to save space */
+        #kt_brand .brand-logo p { display: none; }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var aside = document.getElementById('kt_aside');
+        var overlay = document.getElementById('kt_aside_overlay');
+        if (!aside || !overlay) return;
+
+        // selectors we accept as openers
+        var toggles = [];
+        var byId = document.getElementById('kt_aside_mobile_toggle');
+        if (byId) toggles.push(byId);
+        document.querySelectorAll('[data-aside-toggle]').forEach(function(el){ toggles.push(el); });
+        document.querySelectorAll('.burger-icon').forEach(function(el){ toggles.push(el); });
+
+        function openAside(trigger){
+            aside.classList.add('mobile-open');
+            document.body.classList.add('aside-mobile-open');
+            overlay.classList.remove('d-none');
+            void overlay.offsetWidth;
+            overlay.classList.add('active');
+            if (trigger) trigger.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeAside(trigger){
+            aside.classList.remove('mobile-open');
+            document.body.classList.remove('aside-mobile-open');
+            overlay.classList.remove('active');
+            setTimeout(function(){ overlay.classList.add('d-none'); }, 220);
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        }
+
+        toggles.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+                e.preventDefault();
+                if (aside.classList.contains('mobile-open')) closeAside(btn); else openAside(btn);
+            });
+        });
+
+        // fallback: data-aside-toggle via event delegation
+        document.addEventListener('click', function(e){
+            var el = e.target.closest('[data-aside-toggle]');
+            if (!el) return;
+            e.preventDefault();
+            if (aside.classList.contains('mobile-open')) closeAside(el); else openAside(el);
+        });
+
+        overlay.addEventListener('click', function(){ closeAside(); });
+        document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeAside(); });
+    });
+</script>

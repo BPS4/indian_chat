@@ -22,25 +22,21 @@
                         </span> --}}
                     </div>
 
-                    <div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <!-- Mobile aside toggle placed next to profile -->
+                        <button id="kt_aside_mobile_toggle" class="btn btn-icon btn-sm d-lg-none" data-aside-toggle aria-label="Toggle sidebar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect y="4" width="24" height="2" rx="1" fill="currentColor"/>
+                                <rect y="11" width="24" height="2" rx="1" fill="currentColor"/>
+                                <rect y="18" width="24" height="2" rx="1" fill="currentColor"/>
+                            </svg>
+                        </button>
+
                         {{-- profile icon --}}
                         <div class="btn btn-icon btn-clean btn-lg mr-1 profile" id="kt_quick_user_toggle">
                             <span class="svg-icon svg-icon-xl svg-icon-primary">
 
                                 <a href="{{ route('profile') }}">
-
-                                    <!-- <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                            <polygon points="0 0 24 0 24 24 0 24" />
-                                            <path
-                                                d="M12,2 C14.209139,2 16,3.790861 16,6 C16,8.209139 14.209139,10 12,10 C9.790861,10 8,8.209139 8,6 C8,3.790861 9.790861,2 12,2 Z"
-                                                fill="#000000" fill-rule="nonzero" opacity="0.3" />
-                                            <path
-                                                d="M12,13 C8.6862915,13 6,15.6862915 6,19 L6,20 L18,20 L18,19 C18,15.6862915 15.3137085,13 12,13 Z"
-                                                fill="#000000" fill-rule="nonzero" />
-                                        </g>
-                                    </svg> -->
                             <img src="{{ asset('media/icons/profile.png') }}" alt="">
                                 </a>
                             </span>
