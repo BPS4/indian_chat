@@ -283,6 +283,7 @@
                                         </a>
                                     </li>
                                 @endif
+                                
 
                                    @if (isset($existingPermissions['contact_details']) && $existingPermissions['contact_details'] != 0)
                                     <li class="menu-item  @yield('contact_details')" aria-haspopup="true"

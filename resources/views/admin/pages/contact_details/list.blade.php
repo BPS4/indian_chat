@@ -38,8 +38,8 @@
                         <thead class="offer-table-header">
                             <tr>
                                 <th> ID</th>
-                                <th>Joining Bonous</th>
-                                <th>Refral Commision</th>
+                                <th>Contac 1</th>
+                                <th>Contac 2</th>
                                
                                 <th>Status</th>
                                 <th >Action</th>

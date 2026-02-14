@@ -178,7 +178,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
             ->name('commision.edit');
         Route::put('update/{id}', [CommisionController::class, 'update'])
             ->name('commision.update');
+        Route::post('store', [commisionController::class, 'store'])->name('commision.store');
+    });
 
+      Route::prefix('roi_commision')->group(function () {
+        Route::get('list', [commisionController::class, 'refral_commision'])->name('commision.index');
+        Route::get('add', [commisionController::class, 'add'])->name('commmision.create');
+        Route::get('edit/{id}', [CommisionController::class, 'edit'])
+            ->name('commision.edit');
+        Route::put('update/{id}', [CommisionController::class, 'update'])
+            ->name('commision.update');
         Route::post('store', [commisionController::class, 'store'])->name('commision.store');
     });
 

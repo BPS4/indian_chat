@@ -13,7 +13,7 @@
                         @csrf
                             @method('PUT')
                             <div class="col-lg-9 col-xl-12 mt-3">
-                            <h3>Update Slider</h3>
+                            <h3>Refral Commision</h3>
                             <p>Enter the details to update Slider</p>
                             <div class="row align-items-center">
                                 <div class="form-group col-md-6">
