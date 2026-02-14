@@ -56,6 +56,24 @@ function modulesList()
             'slug' => 'withdrawal',
             'module_name' => 'withdrawal',
         ],
+
+            [
+                'id' => 5,
+                'slug' => 'investment',
+                'module_name' => 'investment',
+            ],
+          
+           
+            [
+                'id' => 10,
+                'slug' => 'user_management',
+                'module_name' => 'user management',
+            ],
+            [
+                'id' => 11,
+                'slug' => 'role_permission',
+                'module_name' => 'role permission',
+            ],
        
       
         [
@@ -1197,31 +1215,6 @@ function bookingAnalyticsChart()
 }
 
 
-function occupacyRate()
-{
-    $current = BookingRoom::whereMonth('created_at', now()->month)
-        ->sum('quantity');
-
-    $previous = BookingRoom::whereMonth('created_at', now()->subMonth()->month)
-        ->sum('quantity');
 
 
-    $growth = $previous > 0
-        ? (($current - $previous) / $previous) * 100
-        : 0;
 
-
-    return [
-        'current' => round($current),
-        'growth' => $growth
-    ];
-}
-
-function roomAnalyticsChart()
-{
-    return BookingRoom::join('room_types', 'room_types.id', '=', 'booking_rooms.room_type_id')
-        ->selectRaw('room_types.room_name as room_type, SUM(booking_rooms.quantity) as total')
-        ->groupBy('room_types.room_name')
-        ->orderBy('room_types.room_name')
-        ->get();
-}

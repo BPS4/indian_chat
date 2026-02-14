@@ -5,9 +5,9 @@
     <div class="card card-custom">
         <div class="card-header flex-wrap border-0 pt-3 pb-0">
             <div class="card-title">
-                <h3 class="card-label">Refral
+                <h3 class="card-label">Commission List
                 </h3>
-                <p>Refral Commision</p>
+                <p>Refral, Joining and ROI Commission</p>
             </div>
             <div class="card-toolbar">
 
@@ -40,7 +40,7 @@
                                 <th> ID</th>
                                 <th>Joining Bonous</th>
                                 <th>Refral Commision</th>
-                               
+                               <th>Roi (%)</th>
                                 <th>Status</th>
                                 <th >Action</th>
                             </tr>
@@ -51,6 +51,7 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $commision->joining_bonus ?? 100 }}</td>
                                             <td>{{ $commision->referral_commision ??500 }}</td>
+                                            <td>{{ $commision->roi ?? 10 }}</td>
                                         
                                         
                                             <td>{{ $commision->Status ? 'Inactive' : 'Active' }}</td>

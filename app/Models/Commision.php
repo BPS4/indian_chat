@@ -12,6 +12,7 @@ class Commision extends Model
     protected $fillable = [
         'joining_bonus',
         'referral_commision',
+        'roi',
         'status',
     ];
 }

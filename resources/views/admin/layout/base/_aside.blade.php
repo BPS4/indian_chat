@@ -189,6 +189,22 @@
                     </li>
                 @endif
 
+                  @if (isset($existingPermissions['investment']) && $existingPermissions['investment'] != 0)
+                    <li class="menu-item menu-item-submenu @yield('investment')" aria-haspopup="true"
+                        data-menu-toggle="hover">
+                        <a href="{{ url('/admin/investment/list') }}" class="menu-link menu-toggle">
+                            <span class="svg-icon menu-icon">
+                                <!-- <span class="flaticon2-percentage"></span> -->
+                                <span><img src="{{ asset('media/icons/customer-ico.png') }}" class="w-75"
+                                        alt=""> </span>
+                            </span>
+                            <span class="menu-text">Investments</span>
+                        </a>
+                    </li>
+                @endif
+
+
+
                 @if (isset($existingPermissions['withdrawal']) && $existingPermissions['withdrawal'] != 0)
                     <li class="menu-item menu-item-submenu @yield('withdrawal') " aria-haspopup="true"
                         data-menu-toggle="hover">

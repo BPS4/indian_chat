@@ -15,6 +15,7 @@ return new class extends Migration
         $table->id();
         $table->string('joining_bonus');
         $table->string('referral_commision');
+        $table->string('roi');
         $table->string('status')->default('active');       
         $table->timestamps();
     });

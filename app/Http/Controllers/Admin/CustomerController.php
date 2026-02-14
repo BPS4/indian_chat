@@ -23,8 +23,7 @@ class CustomerController extends Controller
                 ],
             ];
 
-            $users = User::
-               where('role_id', 2) // only customers
+            $users = User::where('role_id', 2) // only customers
                 ->when($request->search, function ($query, $search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('name', 'LIKE', "%{$search}%")
@@ -72,7 +71,7 @@ class CustomerController extends Controller
                 ],
             ];
 
-          
+
 
             $user = User::with([
                 'bookings',
@@ -142,7 +141,6 @@ class CustomerController extends Controller
                 'user' => $user,
 
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollback();
 
@@ -151,5 +149,29 @@ class CustomerController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+
+    public function updateKyc(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'status' => 'required|in:approved,rejected',
+            'reason' => 'nullable|string'
+        ]);
+
+        $user = User::find($request->user_id);
+
+        $user->kyc_status = $request->status;
+        $user->kyc_reject_reason = $request->status == 'rejected'
+            ? $request->reason
+            : null;
+
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'KYC status updated successfully'
+        ]);
     }
 }

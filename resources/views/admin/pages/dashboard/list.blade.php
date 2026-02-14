@@ -71,7 +71,6 @@
                                 <span>Total City</span>
                                 <img src="{{ asset('media/icons/pending-payment.png') }}" alt="">
                             </div>
-                            @php $occupacy = occupacyRate(); @endphp
                             <h4 class="payment-card-amount py-4">{{ $city }}</h4>
                             <p class="payment-card-subtext">0% from last month</p>
                             <div class="progress occupancy-progress mt-2">
@@ -89,7 +88,6 @@
            
 
 
-            @php $chartData = roomAnalyticsChart();    @endphp
             {{-- {{ $details->links('pagination::bootstrap-5') }} --}}
             <!--end: Datatable-->
         </div>

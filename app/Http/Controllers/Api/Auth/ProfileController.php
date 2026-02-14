@@ -30,6 +30,11 @@ class ProfileController extends Controller
             'email'          => 'nullable|email',
             // 'mobile'         => 'nullable|string|max:15|unique:users,mobile,' . $user->id,
             'at_whatsapp'    => 'nullable|boolean',
+            'pan_card'      => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
+            'aadhaar_front' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
+            'aadhaar_back'  => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
+
+
         ]);
 
         if ($validator->fails()) {
@@ -50,24 +55,70 @@ class ProfileController extends Controller
 
 
         // ✅ Profile Picture Upload
-       if ($request->hasFile('profile_pic') && $request->file('profile_pic')->isValid()) {
+        if ($request->hasFile('profile_pic') && $request->file('profile_pic')->isValid()) {
 
-    // Delete old image from PUBLIC folder
-    if ($user->profile_pic && file_exists(public_path($user->profile_pic))) {
-        unlink(public_path($user->profile_pic));
-    }
+            // Delete old image from PUBLIC folder
+            if ($user->profile_pic && file_exists(public_path($user->profile_pic))) {
+                unlink(public_path($user->profile_pic));
+            }
 
-    $file = $request->file('profile_pic');
+            $file = $request->file('profile_pic');
 
-    // Clean & unique filename
-    $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+            // Clean & unique filename
+            $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
 
-    // Move to public/profile_pics
-    $file->move(public_path('profile_pics'), $filename);
+            // Move to public/profile_pics
+            $file->move(public_path('profile_pics'), $filename);
 
-    // Save relative path in DB
-    $user->profile_pic = 'profile_pics/' . $filename;
-}
+            // Save relative path in DB
+            $user->profile_pic = 'profile_pics/' . $filename;
+        }
+
+
+        // ================= PAN Upload =================
+        if ($request->hasFile('pan_card') && $request->file('pan_card')->isValid()) {
+
+            if ($user->pan_card && file_exists(public_path($user->pan_card))) {
+                unlink(public_path($user->pan_card));
+            }
+
+            $file = $request->file('pan_card');
+            $filename = 'pan_' . time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('kyc'), $filename);
+
+            $user->pan_card = 'kyc/' . $filename;
+        }
+
+
+        // ================= Aadhaar Front =================
+        if ($request->hasFile('aadhaar_front') && $request->file('aadhaar_front')->isValid()) {
+
+            if ($user->aadhaar_front && file_exists(public_path($user->aadhaar_front))) {
+                unlink(public_path($user->aadhaar_front));
+            }
+
+            $file = $request->file('aadhaar_front');
+            $filename = 'aadhaar_front_' . time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('kyc'), $filename);
+
+            $user->aadhaar_front = 'kyc/' . $filename;
+        }
+
+
+        // ================= Aadhaar Back =================
+        if ($request->hasFile('aadhaar_back') && $request->file('aadhaar_back')->isValid()) {
+
+            if ($user->aadhaar_back && file_exists(public_path($user->aadhaar_back))) {
+                unlink(public_path($user->aadhaar_back));
+            }
+
+            $file = $request->file('aadhaar_back');
+            $filename = 'aadhaar_back_' . time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('kyc'), $filename);
+
+            $user->aadhaar_back = 'kyc/' . $filename;
+        }
+
 
 
 
@@ -93,6 +144,14 @@ class ProfileController extends Controller
                 'profile_pic_url' => $user->profile_pic
                     ? asset('storage/' . $user->profile_pic)
                     : null,
+                'kyc_status' => $user->kyc_status,
+                'kyc_reject_reason' => $user->kyc_reject_reason,
+
+                'pan_card_url' => $user->pan_card ? asset($user->pan_card) : null,
+                'aadhaar_front_url' => $user->aadhaar_front ? asset($user->aadhaar_front) : null,
+                'aadhaar_back_url' => $user->aadhaar_back ? asset($user->aadhaar_back) : null,
+
+
             ]
         ], 200);
     }

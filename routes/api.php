@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ContactsController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\InvestmentController;
 
 
 use Illuminate\Support\Facades\Broadcast;
@@ -35,10 +36,6 @@ Route::middleware(['session.token'])->group(function () {
     Route::post('send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/admin-login', [AuthController::class, 'admin_login']);
     Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
-
-  
-
-   
 });
 Route::middleware(['jwt.auth'])->group(function () {
 
@@ -59,7 +56,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('conversations', [ChatController::class, 'myConversations']);
 
     Route::get('conversations-details/{id}', [ChatController::class, 'conversationMessages']);
-    
+
     // Admin conversation (default for all users)
     Route::get('admin-messages', [ChatController::class, 'getAdminConversation']);
 
@@ -71,6 +68,10 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('messages/mark-multiple-read', [ChatController::class, 'markMultipleAsRead']);
 
 
+    // investment
+    Route::post('add-investments', [InvestmentController::class, 'add_investment']);
+    Route::get('/my-wallet', [InvestmentController::class, 'myWallet']);
+
 
 
 
@@ -78,10 +79,6 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('profile', [ProfileController::class, 'profile']);
     Route::post('update-profile', [ProfileController::class, 'updateProfile']);
-
-
-    
-
 });
 
 // Review

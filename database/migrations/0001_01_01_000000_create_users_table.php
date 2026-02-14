@@ -36,6 +36,19 @@ return new class extends Migration
         $table->unsignedBigInteger('referred_by')->nullable();
 
         $table->foreign('referred_by')->references('id')->on('users')->nullOnDelete();
+
+         $table->string('pan_card')->nullable();
+        $table->string('aadhaar_front')->nullable();
+        $table->string('aadhaar_back')->nullable();
+
+        $table->enum('kyc_status', [
+            'not_submitted',
+            'pending',
+            'approved',
+            'rejected'
+        ])->default('not_submitted');
+
+        $table->text('kyc_reject_reason')->nullable();
         
             $table->timestamps();
         });

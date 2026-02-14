@@ -29,7 +29,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\commisionController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\LogoController;
-
+use App\Http\Controllers\Admin\InvestmentController;
+use App\Http\Controllers\Admin\RoiController;
 
 Route::get('', function () {
     if (session()->has('id')) {
@@ -116,7 +117,26 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         Route::get('list', [CustomerController::class, 'customer_list']);
         Route::any('add', [CustomerController::class, 'add_customer']);
         Route::get('view/{id}', [CustomerController::class, 'customer_view']);
+        Route::post('/kyc-update', [CustomerController::class, 'updateKyc'])
+    ->name('customers.kyc.update');
+
+
     });
+
+
+      // INVESTMENT
+    Route::prefix('investment')->group(function () {
+        Route::get('list', [InvestmentController::class, 'investment_list']);
+        Route::any('add', [InvestmentController::class, 'add_investment']);
+        Route::get('view/{id}', [InvestmentController::class, 'investment_view']);
+        Route::post('/investment/{id}/approve', [InvestmentController::class, 'approveInvestment'])
+    ->name('investment.approve');
+
+Route::post('/investment/{id}/reject', [InvestmentController::class, 'rejectInvestment'])
+    ->name('investment.reject');
+
+    });
+
 
     // Search
     Route::prefix('search')->group(function () {
@@ -181,15 +201,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         Route::post('store', [commisionController::class, 'store'])->name('commision.store');
     });
 
-      Route::prefix('roi_commision')->group(function () {
-        Route::get('list', [commisionController::class, 'refral_commision'])->name('commision.index');
-        Route::get('add', [commisionController::class, 'add'])->name('commmision.create');
-        Route::get('edit/{id}', [CommisionController::class, 'edit'])
-            ->name('commision.edit');
-        Route::put('update/{id}', [CommisionController::class, 'update'])
-            ->name('commision.update');
-        Route::post('store', [commisionController::class, 'store'])->name('commision.store');
-    });
+
 
 
 
@@ -213,7 +225,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
 // Payment Gateway
 Route::any('final-payments/{booking_id}', [BookingController::class, 'final_payments']);
 
-// Ajax Request
-
-Route::any('locality-check/{location_id}', [App\Http\Controllers\Admin\HotelController::class, 'locality_check']);
-Route::get('/facilities-check/{group_id}', [App\Http\Controllers\Admin\FacilityController::class, 'facilities_check']);
+// Roi Generator Cron Job
+Route::get('/run-daily-roi', [RoiController::class, 'runDailyROI'])
+    ->name('run.daily.roi');

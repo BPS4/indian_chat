@@ -13,23 +13,31 @@
                         @csrf
                             @method('PUT')
                             <div class="col-lg-9 col-xl-12 mt-3">
-                            <h3>Refral Commision</h3>
-                            <p>Enter the details to update Slider</p>
+                            <h3>Edit Commisions</h3>
+                            <p>Update the commission details</p>
                             <div class="row align-items-center">
                                 <div class="form-group col-md-6">
 
+                                        <label for="joining_bonus" class="form-label">Joining Bonus</label>
                                     <div><input type="text" name="joining_bonus" value="{{ $commision->joining_bonus }}"
                                             required="required" class="form-control" placeholder="Enter Joining Bonus">
                                     </div>
                                 </div>
 
                                 <div class="form-group col-md-6">
-
+                                    <label for="referral_commision" class="form-label">Refral Commision</label>
                                     <div><input type="text" name="referral_commision" value="{{ $commision->referral_commision }}"
                                             required="required" class="form-control" placeholder="Enter Referral Commission ">
                                     </div>
                                 </div>
+
                                 <div class="form-group col-md-6">
+
+                                      <label for="roi" class="form-label">Roi (%)</label>
+                                    <div><input type="number" id="roi" name="roi" value="{{ $commision->roi }}"
+                                            required="required" class="form-control" placeholder="Enter Roi in percentage" min="0" max="100" step="0.01">
+                                    </div>
+                                </div>
                                
                                 {{-- <div class="form-group col-md-6">
 

@@ -59,7 +59,7 @@
                 @if(count($users) > 0)
                 @foreach($users as $key => $value)
                 <tr>
-                    <td>{{$loop->iteration}}</td>
+                    <td>{{$loop->i}}</td>
                     <td>{{$value->name }}</td>
                     <td>{{$value->email }}</td>
                     <td>{{$value->mobile }}</td>

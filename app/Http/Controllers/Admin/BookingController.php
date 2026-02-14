@@ -12,8 +12,9 @@ class BookingController extends Controller
 {
     public function bookings_list(Request $request)
     {
+ 
         try {
-            $page_title = 'Bookings List';
+            $page_title = 'Withdrawal List';
             $page_description = '';
             $breadcrumbs = [
                 [
@@ -24,45 +25,11 @@ class BookingController extends Controller
 
             $perPage = $request->input('per_page', 25);
 
-            $bookings = Booking::with(['payment', 'guests', 'rooms.roomType'])
-                ->when($request->search, function ($q, $search) {
-                    $q->whereHas('guests', function ($q2) use ($search) {
-                        $q2->where('guest_name', 'LIKE', "%{$search}%");
-                        // ->orWhere('email', 'LIKE', "%{$search}%")
-                    })->orWhereHas('hotel', function ($q2) use ($search) {
-                        $q2->where('name', 'LIKE', "%{$search}%");
-                    })->orWhere('id', $search);
-                })
-                ->when($request->status, function ($q, $status) {
-                    $q->where('status', $status);
-                })
-                ->when($request->hotel, function ($q, $hotel) {
-                    $q->whereHas('hotel', function ($q2) use ($hotel) {
-                        $q2->where('name', $hotel);
-                    });
-                })
-                ->when($request->date, function ($q, $date) {
-                    if ($date === 'Today') {
-                        $q->whereDate('created_at', now());
-                    } elseif ($date === 'This Week') {
-                        $q->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
-                    } elseif ($date === 'This Month') {
-                        $q->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
-                    }
-                })
-                ->latest('id')
-                ->paginate($perPage)
-                ->withQueryString();
-
-            $booking_status = Booking::select('status')->distinct()->orderBy('status')
-                ->pluck('status');
-
-            $hotels = Hotel::select('name')->distinct()->orderBy('name')
-                ->pluck('name');
+           
             // dd($hotels);
 
             //   dd($bookings);
-            return view('admin.pages.bookings.list', compact('page_title', 'page_description', 'breadcrumbs', 'bookings', 'booking_status', 'hotels'));
+            return view('admin.pages.withdrawal.list', compact('page_title', 'page_description', 'breadcrumbs', ));
         } catch (\Exception $e) {
             dd($e);
 

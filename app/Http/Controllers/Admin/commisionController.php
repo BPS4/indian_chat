@@ -27,6 +27,7 @@ class commisionController extends Controller
     $request->validate([
         'joining_bonus' => 'required|numeric|min:0',
         'referral_commision' => 'required|numeric|min:0',
+        'roi' => 'required|numeric|min:0',
     ]);
 
     // Check if commission already exists
@@ -37,6 +38,7 @@ class commisionController extends Controller
         $commision->update([
             'joining_bonus' => $request->joining_bonus,
             'referral_commision' => $request->referral_commision,
+            'roi' => $request->roi,
         ]);
 
         return redirect()->back()
@@ -47,6 +49,7 @@ class commisionController extends Controller
     Commision::create([
         'joining_bonus' => $request->joining_bonus,
         'referral_commision' => $request->referral_commision,
+        'roi' => $request->roi,
     ]);
 
     return redirect()->back()
@@ -72,16 +75,18 @@ public function update(Request $request, $id)
     $request->validate([
         'joining_bonus' => 'required|numeric|min:0',
         'referral_commision' => 'required|numeric|min:0',
+        'roi' => 'required|numeric|min:0',
     ]);
 
     $commision->update([
         'joining_bonus' => $request->joining_bonus,
         'referral_commision' => $request->referral_commision,
+        'roi' => $request->roi, 
     ]);
 
     return redirect()
         ->route('commision.index')
-        ->with('success', 'Referral commission updated successfully');
+        ->with('success', 'Commission updated successfully');
 }
 
 

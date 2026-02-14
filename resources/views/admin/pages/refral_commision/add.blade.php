@@ -12,22 +12,31 @@
                             <p>Enter the details to create new Commission</p>
                             <div class="row align-items-center">
                                 <div class="form-group col-md-6">
-
-                                    <div><input type="text" name="joining_bonus" value="{{ old('joining_bonus') }}"
-                                            isrequired="required" class="form-control" placeholder="Joining Bonous">
-                                    </div>
+                                    <label for="joining_bonus" class="form-label">Joining Bonus</label>
+                                    <input type="text" name="joining_bonus" value="{{ old('joining_bonus') }}"
+                                        isrequired="required" class="form-control" placeholder="Joining Bonous">
                                 </div>
 
                                 <div class="form-group col-md-6">
+                                    <label for="referral_commision" class="form-label">Refral Commision</label>
 
-                                    <div><input type="text" name="referral_commision" value="{{ old('referral_commision') }}"
-                                            isrequired="required" class="form-control" placeholder="Refral Commision">
-                                    </div>
+                                    <input type="text" name="referral_commision" value="{{ old('referral_commision') }}"
+                                        isrequired="required" class="form-control" placeholder="Refral Commision">
                                 </div>
-                               
+                                <div class="form-group col-md-6">
 
-                                <div
-                                    class="d-flex  gap-3 mt-4">
+                                    <label for="roi" class="form-label">Roi (%)</label>
+
+                                    <input type="number" id="roi" name="roi" value="{{ old('roi') }}" required
+                                        class="form-control" placeholder="ROI in percentage" min="0" max="100"
+                                        step="0.01">
+                                </div>
+
+
+
+
+
+                                <div class="d-flex  gap-3 mt-4">
                                     <button type="submit" class="btn  bg-brown add">Save</button>
                                     <a href="{{ route('commision.index') }}" class="btn bg-gray px-5">Cancel</a>
                                 </div>

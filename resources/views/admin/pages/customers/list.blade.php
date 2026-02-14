@@ -14,8 +14,8 @@
                 {{-- <a href="{{ url('/admin/hotels/add') }}" class="btn btn-primary font-weight-bolder">
                     + Add Customer</a> --}}
                 <!-- <div>
-                                <img src="{{ asset('media/icons/card-icon.png') }}" alt="">
-                            </div> -->
+                                    <img src="{{ asset('media/icons/card-icon.png') }}" alt="">
+                                </div> -->
                 {{-- <div>
                     <img src="{{ asset('media/icons/card-icon.png') }}" alt="" id="toggleViewIcon"
                         style="cursor:pointer;">
@@ -25,28 +25,28 @@
 
 
             <!-- <form action="" method="get" class="w-100">
-                            <div class="row col-lg-12 pl-0 pr-0">
-                                <div class="col-sm-3">
-                                    <div class="dataTables_length">
-                                        <label>Status</label>
-                                        <select name="status" value="" class="form-control">
-                                            <option value="">All Status</option>
-                                            <option value="0" @if (request('status') == '0') {{ runTimeSelection(0, request('status')) }} @endif>InActive</option>
-                                            <option value="1" @if (request('status') == '1') {{ runTimeSelection(1, request('status')) }} @endif>Active</option>
-                                        </select>
+                                <div class="row col-lg-12 pl-0 pr-0">
+                                    <div class="col-sm-3">
+                                        <div class="dataTables_length">
+                                            <label>Status</label>
+                                            <select name="status" value="" class="form-control">
+                                                <option value="">All Status</option>
+                                                <option value="0" @if (request('status') == '0') {{ runTimeSelection(0, request('status')) }} @endif>InActive</option>
+                                                <option value="1" @if (request('status') == '1') {{ runTimeSelection(1, request('status')) }} @endif>Active</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-5">
+                                        <div class="dataTables_length">
+                                            <label cla>&#160; </label>
+                                            <button type="submit" class="btn btn-success mt-7" data-toggle="tooltip" title="Apply Filter">Filter</button>
+                                            <a href="{{ url('/admin/inventory/list') }}" class="btn btn-default mt-7" data-toggle="tooltip" title="Reset Filter">Reset</a>
+
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div class="col-sm-5">
-                                    <div class="dataTables_length">
-                                        <label cla>&#160; </label>
-                                        <button type="submit" class="btn btn-success mt-7" data-toggle="tooltip" title="Apply Filter">Filter</button>
-                                        <a href="{{ url('/admin/inventory/list') }}" class="btn btn-default mt-7" data-toggle="tooltip" title="Reset Filter">Reset</a>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </form> -->
+                            </form> -->
 
 
 
@@ -125,7 +125,11 @@
                             <th>State </th>
                             <th>City </th>
                             <th>Joning Date </th>
-                            <th>Total Earning </th>
+                            {{-- <th>Total Earning </th> --}}
+                            <th>Pan Card</th>
+                            <th>Aadhaar Front</th>
+                            <th>Aadhaar Back</th>
+                            <th>Kyc Status</th>
                             <td>Status</td>
                             <!-- <th>On Hold </th> -->
                             {{-- <th class="custom_action">Action</th> --}}
@@ -138,11 +142,11 @@
                                     <img src="{{ asset('media/users/customer-ico.png') }}" alt="image" />
                                 </td>
                                 <td>
-                                    {{ $user->user_id }}
+                                    {{ $user->user_id ?? 'N/A' }}
                                 </td>
 
                                 <td>
-                                    {{ $user->name }}
+                                    {{ $user->name ?? 'N/A' }}
                                 </td>
                                 <td>
                                     <div>
@@ -156,7 +160,56 @@
                                 {{-- <td>
                                 </td> --}}
                                 <td>{{ $user->created_at->format('d-m-Y') }}</td>
-                                <td>{{ $user->wallet_amount ?? 'N/A' }}</td>
+                                {{-- <td>{{ $user->wallet_amount ?? 'N/A' }}</td> --}}
+                                <td>
+                                    @if ($user->pan_card)
+                                        <a href="javascript:void(0)" onclick="showImage('{{ asset($user->pan_card) }}')">
+                                            <i class="fa fa-eye text-primary"></i>
+                                        </a>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if ($user->aadhaar_front)
+                                        <a href="javascript:void(0)"
+                                            onclick="showImage('{{ asset($user->aadhaar_front) }}')">
+                                            <i class="fa fa-eye text-primary"></i>
+                                        </a>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+
+                                <td>
+                                    @if ($user->aadhaar_back)
+                                        <a href="javascript:void(0)"
+                                            onclick="showImage('{{ asset($user->aadhaar_back) }}')">
+                                            <i class="fa fa-eye text-primary"></i>
+                                        </a>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+
+<td>
+    <a href="javascript:void(0)"
+       onclick="openKycModal({{ $user->id }}, '{{ $user->kyc_status }}')">
+
+        @if ($user->kyc_status == 'pending')
+            <span class="badge bg-warning text-dark">Pending</span>
+        @elseif ($user->kyc_status == 'approved')
+            <span class="badge bg-success">Approved</span>
+        @elseif ($user->kyc_status == 'rejected')
+            <span class="badge bg-danger">Rejected</span>
+        @else
+            <span class="badge bg-warning ">Not Submitted</span>
+        @endif
+
+    </a>
+</td>
+
                                 <td>
                                     @if ($user->status == '1')
                                         <span class="badge badge-success">Active</span>
@@ -180,222 +233,109 @@
                 {{ $users->links('pagination::bootstrap-5') }}
             </div>
 
-            <div id="cardView" class="row" style="display:none;">
-
-                <div class="row g-4">
-
-                    <!-- Hotel Card -->
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="hotel-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <div class="hotel-name">Grand Plaza Hotel</div>
-                                <span class="status-badge">Active</span>
-                            </div>
-                            <div class="hotel-location mb-2"><span><img src="{{ asset('media/icons/location1.png') }}"
-                                        alt=""> </span> Noida, IND</div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex justify-content-between align-items-center gap-2 star"><span><img
-                                            src="{{ asset('media/icons/emoji_star.png') }}" alt=""></span> 4.5
-                                </div>
-                                <div class=" text-gray">250 Rooms</div>
-                            </div>
-
-                            <div class="d-flex flex-wrap mb-4 gap-2">
-                                <span class="feature-btn">Wifi</span>
-                                <span class="feature-btn">Pool</span>
-                                <span class="feature-btn">Arcade</span>
-                                <span class="feature-btn">Restaurant</span>
-                                <span class="feature-btn">Parking</span>
-                                <span class="feature-btn">Breakfast</span>
-                            </div>
-
-                            <div class="pt-2 mb-1 text-muted monthly-revenue">Monthly Revenue</div>
-                            <div class="revenue mb-5">Rs 100,000</div>
-
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-delete "><i class="la la-trash me-1"></i> Delete</button>
-                                <button class="btn btn-edit ">Edit</button>
-                            </div>
+            <!-- Image View Modal -->
+            <div class="modal fade" id="imageModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Document Preview</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img id="previewImage" src="" class="img-fluid" />
                         </div>
                     </div>
-
-                    <!-- Duplicate for demo -->
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="hotel-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <div class="hotel-name">Grand Plaza Hotel</div>
-                                <span class="status-badge">Active</span>
-                            </div>
-                            <div class="hotel-location mb-2"><span><img src="{{ asset('media/icons/location1.png') }}"
-                                        alt=""> </span> Noida, IND</div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex justify-content-between align-items-center gap-2 star"><span><img
-                                            src="{{ asset('media/icons/emoji_star.png') }}" alt=""></span> 4.5
-                                </div>
-                                <div class=" text-gray">250 Rooms</div>
-                            </div>
-
-                            <div class="d-flex flex-wrap mb-4 gap-2">
-                                <span class="feature-btn">Wifi</span>
-                                <span class="feature-btn">Pool</span>
-                                <span class="feature-btn">Arcade</span>
-                                <span class="feature-btn">Restaurant</span>
-                                <span class="feature-btn">Parking</span>
-                                <span class="feature-btn">Breakfast</span>
-                            </div>
-
-                            <div class="pt-2 mb-1 text-muted monthly-revenue">Monthly Revenue</div>
-                            <div class="revenue mb-5">Rs 100,000</div>
-
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-delete "><i class="la la-trash me-1"></i> Delete</button>
-                                <button class="btn btn-edit ">Edit</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="hotel-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <div class="hotel-name">Grand Plaza Hotel</div>
-                                <span class="status-badge">Active</span>
-                            </div>
-                            <div class="hotel-location mb-2"><span><img src="{{ asset('media/icons/location1.png') }}"
-                                        alt=""> </span> Noida, IND</div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex justify-content-between align-items-center gap-2 star"><span><img
-                                            src="{{ asset('media/icons/emoji_star.png') }}" alt=""></span> 4.5
-                                </div>
-                                <div class=" text-gray">250 Rooms</div>
-                            </div>
-
-                            <div class="d-flex flex-wrap mb-4 gap-2">
-                                <span class="feature-btn">Wifi</span>
-                                <span class="feature-btn">Pool</span>
-                                <span class="feature-btn">Arcade</span>
-                                <span class="feature-btn">Restaurant</span>
-                                <span class="feature-btn">Parking</span>
-                                <span class="feature-btn">Breakfast</span>
-                            </div>
-
-                            <div class="pt-2 mb-1 text-muted monthly-revenue">Monthly Revenue</div>
-                            <div class="revenue mb-5">Rs 100,000</div>
-
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-delete "><i class="la la-trash me-1"></i> Delete</button>
-                                <button class="btn btn-edit ">Edit</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="hotel-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <div class="hotel-name">Grand Plaza Hotel</div>
-                                <span class="status-badge">Active</span>
-                            </div>
-                            <div class="hotel-location mb-2"><span><img src="{{ asset('media/icons/location1.png') }}"
-                                        alt=""> </span> Noida, IND</div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex justify-content-between align-items-center gap-2 star"><span><img
-                                            src="{{ asset('media/icons/emoji_star.png') }}" alt=""></span> 4.5
-                                </div>
-                                <div class=" text-gray">250 Rooms</div>
-                            </div>
-
-                            <div class="d-flex flex-wrap mb-4 gap-2">
-                                <span class="feature-btn">Wifi</span>
-                                <span class="feature-btn">Pool</span>
-                                <span class="feature-btn">Arcade</span>
-                                <span class="feature-btn">Restaurant</span>
-                                <span class="feature-btn">Parking</span>
-                                <span class="feature-btn">Breakfast</span>
-                            </div>
-
-                            <div class="pt-2 mb-1 text-muted monthly-revenue">Monthly Revenue</div>
-                            <div class="revenue mb-5">Rs 100,000</div>
-
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-delete "><i class="la la-trash me-1"></i> Delete</button>
-                                <button class="btn btn-edit ">Edit</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="hotel-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <div class="hotel-name">Grand Plaza Hotel</div>
-                                <span class="status-badge">Active</span>
-                            </div>
-                            <div class="hotel-location mb-2"><span><img src="{{ asset('media/icons/location1.png') }}"
-                                        alt=""> </span> Noida, IND</div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex justify-content-between align-items-center gap-2 star"><span><img
-                                            src="{{ asset('media/icons/emoji_star.png') }}" alt=""></span> 4.5
-                                </div>
-                                <div class=" text-gray">250 Rooms</div>
-                            </div>
-
-                            <div class="d-flex flex-wrap mb-4 gap-2">
-                                <span class="feature-btn">Wifi</span>
-                                <span class="feature-btn">Pool</span>
-                                <span class="feature-btn">Arcade</span>
-                                <span class="feature-btn">Restaurant</span>
-                                <span class="feature-btn">Parking</span>
-                                <span class="feature-btn">Breakfast</span>
-                            </div>
-
-                            <div class="pt-2 mb-1 text-muted monthly-revenue">Monthly Revenue</div>
-                            <div class="revenue mb-5">Rs 100,000</div>
-
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-delete "><i class="la la-trash me-1"></i> Delete</button>
-                                <button class="btn btn-edit ">Edit</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
-                        <div class="hotel-card h-100">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <div class="hotel-name">Grand Plaza Hotel</div>
-                                <span class="status-badge">Active</span>
-                            </div>
-                            <div class="hotel-location mb-2"><span><img src="{{ asset('media/icons/location1.png') }}"
-                                        alt=""> </span> Noida, IND</div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex justify-content-between align-items-center gap-2 star"><span><img
-                                            src="{{ asset('media/icons/emoji_star.png') }}" alt=""></span> 4.5
-                                </div>
-                                <div class=" text-gray">250 Rooms</div>
-                            </div>
-
-                            <div class="d-flex flex-wrap mb-4 gap-2">
-                                <span class="feature-btn">Wifi</span>
-                                <span class="feature-btn">Pool</span>
-                                <span class="feature-btn">Arcade</span>
-                                <span class="feature-btn">Restaurant</span>
-                                <span class="feature-btn">Parking</span>
-                                <span class="feature-btn">Breakfast</span>
-                            </div>
-
-                            <div class="pt-2 mb-1 text-muted monthly-revenue">Monthly Revenue</div>
-                            <div class="revenue mb-5">Rs 100,000</div>
-
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-delete "><i class="la la-trash me-1"></i> Delete</button>
-                                <button class="btn btn-edit ">Edit</button>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
+
+
+            <script>
+                function showImage(imageUrl) {
+                    document.getElementById('previewImage').src = imageUrl;
+                    var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                    myModal.show();
+                }
+            </script>
+
+
+// kyc status change modal
+
+<div class="modal fade" id="kycModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Update KYC Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="kyc_user_id">
+
+                <div class="mb-3">
+                    <label>Status</label>
+                    <select id="kyc_status" class="form-control">
+                        <option value="approved">Approve</option>
+                        <option value="rejected">Reject</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Reject Reason (if rejected)</label>
+                    <textarea id="kyc_reason" class="form-control"></textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="updateKycStatus()">Submit</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+function openKycModal(userId, currentStatus) {
+
+    document.getElementById('kyc_user_id').value = userId;
+    document.getElementById('kyc_status').value = currentStatus;
+    document.getElementById('kyc_reason').value = '';
+
+    var myModal = new bootstrap.Modal(document.getElementById('kycModal'));
+    myModal.show();
+}
+
+
+function updateKycStatus() {
+
+    let userId = document.getElementById('kyc_user_id').value;
+    let status = document.getElementById('kyc_status').value;
+    let reason = document.getElementById('kyc_reason').value;
+
+    fetch("{{ route('customers.kyc.update') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({
+            user_id: userId,
+            status: status,
+            reason: reason
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        location.reload();
+    });
+}
+</script>
+
+
 
             {{-- {{ $details->links('pagination::bootstrap-5') }} --}}
             <!--end: Datatable-->
@@ -459,5 +399,5 @@
 
     {{-- page scripts --}}
     <!-- <script src="{{ asset('js/pages/crud/datatables/basic/basic.js') }}" type="text/javascript"></script>
-                <script src="{{ asset('js/app.js') }}" type="text/javascript"></script> -->
+                    <script src="{{ asset('js/app.js') }}" type="text/javascript"></script> -->
 @endsection

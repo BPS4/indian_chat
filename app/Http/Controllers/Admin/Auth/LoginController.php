@@ -316,6 +316,7 @@ class LoginController extends Controller
 
             if ($request->isMethod('post')) {
 
+            // dd($request->all());
                 $validator = Validator::make($request->all(), [
                     'hash' => 'required',
                     'otp' => 'required|array|size:6',
