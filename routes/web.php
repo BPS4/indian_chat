@@ -31,6 +31,9 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\LogoController;
 use App\Http\Controllers\Admin\InvestmentController;
 use App\Http\Controllers\Admin\RoiController;
+use App\Http\Controllers\Admin\WithdrawalController;
+
+
 
 Route::get('', function () {
     if (session()->has('id')) {
@@ -145,11 +148,18 @@ Route::post('/investment/{id}/reject', [InvestmentController::class, 'rejectInve
 
     // Bookings
     Route::prefix('withdrawal')->group(function () {
-        Route::get('list', [AdminBookingController::class, 'bookings_list']);
-        Route::get('add', [AdminBookingController::class, 'add_booking']);
-        Route::post('status/{booking}', [AdminBookingController::class, 'updateStatus']);
-        Route::get('/booking_details/{id}', [AdminBookingController::class, 'show'])
-            ->name('booking.show');
+        Route::get('list', [WithdrawalController::class, 'withdrawal_list']);
+        Route::get('add', [WithdrawalController::class, 'add_withdrawal']);
+        Route::post('status/{withdrawal}', [WithdrawalController::class, 'updateStatus']);
+        Route::get('/withdrawal_details/{id}', [WithdrawalController::class, 'show'])
+            ->name('withdrawal.show');
+
+        Route::post('/withdrawal/{id}/approve', [WithdrawalController::class, 'approve'])
+            ->name('withdrawal.approve');
+
+        Route::post('/withdrawal/{id}/reject', [WithdrawalController::class, 'reject'])
+             ->name('withdrawal.reject');
+
     });
 
     // Offers

@@ -114,7 +114,7 @@ class CustomerController extends Controller
                     'errors' => $validator->errors(),
                 ], 422);
             }
-
+    
             DB::beginTransaction();
 
             // Prepare data

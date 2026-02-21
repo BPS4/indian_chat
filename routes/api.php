@@ -71,6 +71,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     // investment
     Route::post('add-investments', [InvestmentController::class, 'add_investment']);
     Route::get('/my-wallet', [InvestmentController::class, 'myWallet']);
+    Route::post('/withdraw-request', [InvestmentController::class, 'withdrawRequest']);
+
 
 
 
