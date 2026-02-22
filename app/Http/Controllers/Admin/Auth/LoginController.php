@@ -266,6 +266,8 @@ class LoginController extends Controller
                 $systemRoles = json_decode($systemRoles[0]['permission'], true);
             }
 
+            // dd($systemRoles);
+
             Session::put([
                 'id' => $id,
                 'name' => $name,

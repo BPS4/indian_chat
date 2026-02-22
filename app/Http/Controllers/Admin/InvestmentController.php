@@ -187,6 +187,11 @@ class InvestmentController extends Controller
         $totalROI = RoiGenerator::where('user_id', $user->id)
             ->sum('roi_amount');
 
+        $refral_wallet = RefralWallet::where('user_id', $user->id)
+            ->get();
+
+
+
         return response()->json([
             'status' => true,
             'investment_wallet' => $wallet->investment_balance,
@@ -263,7 +268,7 @@ class InvestmentController extends Controller
                     throw new \Exception('ROI wallet withdrawal is currently not allowed');
                 } elseif ($wallet_type == 'refral') {
 
-                // dd($user->id);
+                    // dd($user->id);
                     $wallet = RefralWallet::where('user_id', $user->id)
                         ->lockForUpdate()
                         ->firstOrFail();
@@ -297,5 +302,26 @@ class InvestmentController extends Controller
                 'message' => $e->getMessage()
             ], 400);
         }
+    }
+
+    public function withdrawList()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        $withdrawals = Withdrawal::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $withdrawals
+        ]);
     }
 }

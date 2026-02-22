@@ -36,6 +36,9 @@ Route::middleware(['session.token'])->group(function () {
     Route::post('send-otp', [AuthController::class, 'sendOtp']);
     Route::post('/admin-login', [AuthController::class, 'admin_login']);
     Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
+
+    Route::get('/forget-password-request', [AuthController::class, 'forgetPassword_Request']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 });
 Route::middleware(['jwt.auth'])->group(function () {
 
@@ -71,6 +74,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     // investment
     Route::post('add-investments', [InvestmentController::class, 'add_investment']);
     Route::get('/my-wallet', [InvestmentController::class, 'myWallet']);
+    Route::get('/withdraw-list', [InvestmentController::class, 'withdrawList']);
+
     Route::post('/withdraw-request', [InvestmentController::class, 'withdrawRequest']);
 
 

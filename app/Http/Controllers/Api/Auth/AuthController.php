@@ -16,8 +16,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Wallet;
-use Illuminate\Support\Facades\DB;
 use App\Models\Commision;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+
 
 class AuthController extends Controller
 {
@@ -50,6 +53,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'mobile' => 'required|digits:10',
             'referral_code' => 'nullable|exists:users,referral_code',
+            'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails()) {
@@ -57,10 +61,7 @@ class AuthController extends Controller
         }
 
         $mobileNumber = $request->input('mobile');
-        // $otp = rand(100000, 999999);  // Generate a 6-digit OTP
-        $otp = 1234;  // Generate a 4-digit OTP
-
-
+        $password = $request->input('password'); // Use provided password or generate random one
 
         $sponsor = null;
 
@@ -71,45 +72,39 @@ class AuthController extends Controller
         }
 
 
-        // dd($sponsor);
-        $response = Helper::sendOtpToPhone($mobileNumber, $otp);
-        // dd($response);
-        if ($response['success']) {
-            $user = User::where('mobile', $mobileNumber)->first();
 
-            // If not found, create new user
-            if (!$user) {
-                $user = User::create([
-                    'mobile' => $mobileNumber,
-                    'email'  => null,
-                    'role_id'  => User::CUSTOMER,
-                    'password' => bcrypt(Str::random(10)),
-                    'referral_code' => generateReferralCode(),
-                    'referred_by' => $sponsor?->id,
-                ]);
+        $user = User::where('mobile', $mobileNumber)->first();
 
-                Wallet::create([
-                    'user_id' => $user->id,
-                    'balance' => 0,
-                ]);
-            }
+        // If not found, create new user
+        if (!$user) {
+            $user = User::create([
+                'mobile' => $mobileNumber,
+                'email'  => null,
+                'role_id'  => User::CUSTOMER,
+                'password' => Hash::make($request->password),
+                'referral_code' => generateReferralCode(),
+                'referred_by' => $sponsor?->id,
+            ]);
 
-            // dd('hi');
-
-            UserAuth::updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'otp' => $otp,
-                    'hash' => bin2hex(random_bytes(16)),
-                    'is_verified' => false,
-                    'expire_at' => now()->addMinutes(5),
-                ]
-            );
-
-            return response()->json(['message' => 'OTP sent successfully']);
-        } else {
-            return response()->json(['message' => 'Failed to send OTP', 'details' => $response['error']], 500);
+            Wallet::create([
+                'user_id' => $user->id,
+                'balance' => 0,
+            ]);
         }
+
+        // dd('hi');
+
+        // UserAuth::updateOrCreate(
+        //     ['user_id' => $user->id],
+        //     [
+        //         'otp' =>  Hash::make($request->password),
+        //         'hash' => bin2hex(random_bytes(16)),
+        //         'is_verified' => false,
+        //         'expire_at' => now()->addMinutes(5),
+        //     ]
+        // );
+
+        return response()->json(['message' => 'OTP sent successfully']);
     }
 
     public function verifyOtp(Request $request)
@@ -118,7 +113,7 @@ class AuthController extends Controller
             // Validate input
             $validator = Validator::make($request->all(), [
                 'mobile' => 'required',
-                'otp'   => 'required|digits:4',
+                'password' => 'required|string|min:6',
             ]);
 
             if ($validator->fails()) {
@@ -126,13 +121,18 @@ class AuthController extends Controller
             }
 
             $login = $request->input('mobile');
-            $otp   = $request->input('otp');
+            $password = $request->input('password'); // Use provided password or OTP
 
             // Determine if login is mobile or email
             if (is_numeric($login) && strlen($login) === 10) {
-                $user = User::where('mobile', $login)->where('status', 1)->first();
+                $user = User::where('mobile', $login)
+                    ->where('status', 1)
+                    ->first();
+                if (!$user || !Hash::check($password, $user->password)) {
+                    return response()->json(['message' => 'Invalid credentials'], 401);
+                }
             } elseif (filter_var($login, FILTER_VALIDATE_EMAIL)) {
-                $user = User::where('email', $login)->where('status', 1)->first();
+                $user = User::where('email', $login)->where('password',  Hash::make($password))->where('status', 1)->first();
             } else {
                 return response()->json(['message' => 'Invalid login format'], 422);
             }
@@ -147,15 +147,14 @@ class AuthController extends Controller
             // }
 
             // Check OTP
-            $auth = UserAuth::where('user_id', $user->id)
-                ->where('otp', $otp)
-                ->where('is_verified', false)
-                ->where('expire_at', '>=', now())
-                ->first();
+            // $auth = UserAuth::where('user_id', $user->id)
+            //     ->where('is_verified', false)
+            //     ->where('expire_at', '>=', now())
+            //     ->first();
 
-            if (!$auth) {
-                return response()->json(['message' => 'Invalid or expired OTP'], 400);
-            }
+            // if (!$auth || !Hash::check($password, $auth->otp)) {
+            //     return response()->json(['message' => 'Invalid or expired OTP'], 400);
+            // }
 
 
 
@@ -163,13 +162,13 @@ class AuthController extends Controller
             // dd($refral_commision, $joining_bonus);
 
 
-            DB::transaction(function () use ($auth, $user) {
+            DB::transaction(function () use ($user) {
 
                 $refral_commision = Commision::select('referral_commision')->first();
                 $joining_bonus = Commision::select('joining_bonus')->first();
 
                 // Mark OTP as verified
-                $auth->update(['is_verified' => true]);
+                // $auth->update(['is_verified' => true]);
 
                 // Create wallet if not exists
                 $wallet = Wallet::firstOrCreate(
@@ -213,6 +212,125 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+
+
+
+    public function forgetPassword_Request(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid email address'
+            ], 422);
+        }
+
+        try {
+
+            DB::beginTransaction();
+
+            $user = User::where('email', $request->email)->firstOrFail();
+
+            // Generate 6-digit OTP
+            $otp = random_int(100000, 999999);
+
+            // Store / Update OTP record
+            UserAuth::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'otp'         => $otp,
+                    'hash'        => bin2hex(random_bytes(32)),
+                    'is_verified' => false,
+                    'expire_at'   => now()->addMinutes(5),
+                ]
+            );
+
+            // 🔹 Send OTP via email (Example)
+            Mail::raw("Your OTP is: $otp", function ($message) use ($user) {
+                $message->to($user->email)
+                    ->subject('Password Reset OTP');
+            });
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'OTP sent successfully'
+            ]);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong. Please try again.'
+            ], 500);
+        }
+    }
+
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'otp'   => 'required|digits:6',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $user = User::where('email', $request->email)->firstOrFail();
+
+            $userAuth = UserAuth::where('user_id', $user->id)
+                ->where('otp', $request->otp)
+                ->where('expire_at', '>', now())
+                ->first();
+
+            if (!$userAuth) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid or expired OTP'
+                ], 422);
+            }
+
+            // Update user password
+            $user->update([
+                'password' => $request->new_password
+            ]);
+
+            // Mark OTP as verified
+            $userAuth->update(['is_verified' => true]);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Password reset successfully'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong. Please try again.'
+            ], 500);
+        }
+    }
+
+
+
 
     public function logout(Request $request)
     {
