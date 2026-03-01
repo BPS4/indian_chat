@@ -44,7 +44,7 @@ class InvestmentController extends Controller
             // Validation
             $validator = Validator::make($request->all(), [
                 'amount' => 'required|numeric|min:1',
-                'payment_receipt' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+                'payment_receipt' => 'required|file|mimes:jpg,jpeg,png,pdf|max:20048',
             ]);
 
             if ($validator->fails()) {
@@ -156,7 +156,7 @@ class InvestmentController extends Controller
     public function myWallet()
     {
         $user = Auth::user();
-
+        
         if (!$user) {
             return response()->json([
                 'status' => false,
@@ -166,12 +166,14 @@ class InvestmentController extends Controller
 
         // Get wallet
         $wallet = Investment_wallet::where('user_id', $user->id)->first();
+          $refral_wallet = RefralWallet::where('user_id', $user->id)
+        ->get();
 
         if (!$wallet) {
             return response()->json([
                 'status' => true,
                 'investment_wallet' => 0,
-                'roi_wallet' => 0,
+                'refral_wallet' => $refral_wallet->sum('balance'),
                 'today_roi' => 0,
                 'total_amount' => 0
             ]);
@@ -187,17 +189,19 @@ class InvestmentController extends Controller
         $totalROI = RoiGenerator::where('user_id', $user->id)
             ->sum('roi_amount');
 
-        $refral_wallet = RefralWallet::where('user_id', $user->id)
-            ->get();
+     
+        // dd('test');
 
 
 
         return response()->json([
             'status' => true,
             'investment_wallet' => $wallet->investment_balance,
+            'refral_wallet' => $refral_wallet->sum('balance'),
             'roi_wallet' => $wallet->roi_balance,
             'today_roi' => $todayROI,
             'total_amount' => $wallet->investment_balance + $wallet->roi_balance,
+            'test' => 'test'
         ]);
     }
 

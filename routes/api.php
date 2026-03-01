@@ -2,18 +2,14 @@
 
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\ProfileController;
-use App\Http\Controllers\Api\Hotel\HotelController;
 use App\Http\Controllers\Api\Booking\BookingController;
-use App\Http\Controllers\Api\Coupons\CouponsController;
 use App\Http\Controllers\Api\Review\ReviewController;
-use App\Http\Controllers\Api\Term\TermController;
-use App\Http\Controllers\Api\Hotel\HotelRoomController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ContactsController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\InvestmentController;
+use App\Http\Controllers\Admin\AccountController;
 
 
 use Illuminate\Support\Facades\Broadcast;
@@ -86,6 +82,9 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('profile', [ProfileController::class, 'profile']);
     Route::post('update-profile', [ProfileController::class, 'updateProfile']);
+    Route::any('update-bank-account', [AccountController::class, 'updateBankAccount']);
+
+
 });
 
 // Review

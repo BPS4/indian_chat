@@ -51,14 +51,30 @@ class AuthController extends Controller
     public function sendOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'mobile' => 'required|digits:10',
+            'mobile' => 'required|digits:10|unique:users,mobile',
             'referral_code' => 'nullable|exists:users,referral_code',
             'password' => 'required|string|min:6',
+        ], [
+            'mobile.unique' => 'This mobile number is already registered.',
+            'mobile.digits' => 'Mobile number must be exactly 10 digits.',
+            'referral_code.exists' => 'Invalid referral code.',
+            'password.min' => 'Password must be at least 6 characters.',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'Invalid mobile number or referral id'], 422);
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first(),
+                'errors' => $validator->errors()
+            ], 422);
         }
+
+        //  if ($validator->fails()) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => $validator->errors()
+        //     ], 422);
+        // }
 
         $mobileNumber = $request->input('mobile');
         $password = $request->input('password'); // Use provided password or generate random one
@@ -90,6 +106,52 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'balance' => 0,
             ]);
+
+            if ($user) {
+
+                DB::transaction(function () use ($user) {
+
+                    $refral_commision = Commision::select('referral_commision')->first();
+                    $joining_bonus = Commision::select('joining_bonus')->first();
+
+                    // Mark OTP as verified
+                    // $auth->update(['is_verified' => true]);
+
+                    // Create wallet if not exists
+                    $wallet = Wallet::firstOrCreate(
+                        ['user_id' => $user->id],
+                        ['balance' => 0]
+                    );
+
+
+
+                    // 🔒 Apply bonus ONLY ON FIRST VERIFICATION
+                    if ($wallet->balance == 0) {
+
+                        // Joining bonus
+                        $wallet->increment('balance', $joining_bonus->joining_bonus);
+
+                        // Referral bonus to sponsor
+                        if ($user->referred_by) {
+                            Wallet::firstOrCreate(
+                                ['user_id' => $user->referred_by],
+                                ['balance' => 0]
+                            )->increment('balance', $refral_commision->referral_commision);
+                        }
+                    }
+                });
+                // dd('hi');
+
+                Auth::login($user);
+
+                $accessToken = JWTAuth::fromUser($user);
+
+                return response()->json([
+                    'message' => 'OTP verified successfully',
+                    'access_token' => $accessToken,
+                    'user' => $user->load('wallet'),
+                ]);
+            }
         }
 
         // dd('hi');
@@ -104,7 +166,7 @@ class AuthController extends Controller
         //     ]
         // );
 
-        return response()->json(['message' => 'OTP sent successfully']);
+        return response()->json(['message' => 'Register successfully']);
     }
 
     public function verifyOtp(Request $request)
@@ -164,34 +226,34 @@ class AuthController extends Controller
 
             DB::transaction(function () use ($user) {
 
-                $refral_commision = Commision::select('referral_commision')->first();
-                $joining_bonus = Commision::select('joining_bonus')->first();
+                // $refral_commision = Commision::select('referral_commision')->first();
+                // $joining_bonus = Commision::select('joining_bonus')->first();
 
-                // Mark OTP as verified
-                // $auth->update(['is_verified' => true]);
+                // // Mark OTP as verified
+                // // $auth->update(['is_verified' => true]);
 
-                // Create wallet if not exists
-                $wallet = Wallet::firstOrCreate(
-                    ['user_id' => $user->id],
-                    ['balance' => 0]
-                );
+                // // Create wallet if not exists
+                // $wallet = Wallet::firstOrCreate(
+                //     ['user_id' => $user->id],
+                //     ['balance' => 0]
+                // );
 
 
 
-                // 🔒 Apply bonus ONLY ON FIRST VERIFICATION
-                if ($wallet->balance == 0) {
+                // // 🔒 Apply bonus ONLY ON FIRST VERIFICATION
+                // if ($wallet->balance == 0) {
 
-                    // Joining bonus
-                    $wallet->increment('balance', $joining_bonus->joining_bonus);
+                //     // Joining bonus
+                //     $wallet->increment('balance', $joining_bonus->joining_bonus);
 
-                    // Referral bonus to sponsor
-                    if ($user->referred_by) {
-                        Wallet::firstOrCreate(
-                            ['user_id' => $user->referred_by],
-                            ['balance' => 0]
-                        )->increment('balance', $refral_commision->referral_commision);
-                    }
-                }
+                //     // Referral bonus to sponsor
+                //     if ($user->referred_by) {
+                //         Wallet::firstOrCreate(
+                //             ['user_id' => $user->referred_by],
+                //             ['balance' => 0]
+                //         )->increment('balance', $refral_commision->referral_commision);
+                //     }
+                // }
             });
             // dd('hi');
 

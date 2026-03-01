@@ -1,27 +1,18 @@
 <?php
 
-use App\Http\Controllers\Admin\AddOnsController;
 use App\Http\Controllers\Admin\Auth\AuthController;
 use App\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
-use App\Http\Controllers\Admin\BookingController as AdminBookingController;
-use App\Http\Controllers\Admin\CouponController;
+
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\FacilityController;
-use App\Http\Controllers\Admin\FacilityGroupController;
-use App\Http\Controllers\Admin\GiftCardController;
-use App\Http\Controllers\Admin\GuestPhotoController;
-use App\Http\Controllers\Admin\HotelRoomController;
-use App\Http\Controllers\Admin\LocalityController;
+
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\OffersController;
 use App\Http\Controllers\Admin\PaymentController;
-use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\SliderController;
-use App\Http\Controllers\Admin\TermController;
+
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\Booking\BookingController;
 use App\Http\Controllers\chatcontroller;
