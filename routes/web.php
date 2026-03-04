@@ -111,6 +111,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['CheckSession']], function (
         Route::get('list', [CustomerController::class, 'customer_list']);
         Route::any('add', [CustomerController::class, 'add_customer']);
         Route::get('view/{id}', [CustomerController::class, 'customer_view']);
+        // Return bank account details for a given user (AJAX)
+        Route::get('bank/{id}', [CustomerController::class, 'bankDetails']);
         Route::post('/kyc-update', [CustomerController::class, 'updateKyc'])
     ->name('customers.kyc.update');
 

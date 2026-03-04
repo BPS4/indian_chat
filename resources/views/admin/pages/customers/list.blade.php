@@ -130,6 +130,7 @@
                             <th>Aadhaar Front</th>
                             <th>Aadhaar Back</th>
                             <th>Kyc Status</th>
+                            <th>Bank</th>
                             <td>Status</td>
                             <!-- <th>On Hold </th> -->
                             {{-- <th class="custom_action">Action</th> --}}
@@ -210,6 +211,19 @@
     </a>
 </td>
 
+ <td>
+                                    <button
+                                        class="btn btn-sm btn-success"
+                                        title="view"
+                                        onclick="openBankModal({{ $user->id }})">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+
+
+                                </td>
+
+                                
+
                                 <td>
                                     @if ($user->status == '1')
                                         <span class="badge badge-success">Active</span>
@@ -258,7 +272,7 @@
             </script>
 
 
-// kyc status change modal
+     <!--  kyc status change modal -->
 
 <div class="modal fade" id="kycModal" tabindex="-1">
     <div class="modal-dialog">
@@ -333,6 +347,72 @@ function updateKycStatus() {
         location.reload();
     });
 }
+</script>
+
+
+<!-- Bank Details Modal -->
+<div class="modal fade" id="bankModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bank Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-2"><strong>Bank Name:</strong> <span id="bank_name">N/A</span></div>
+                <div class="mb-2"><strong>Account Number:</strong> <span id="account_number">N/A</span></div>
+                <div class="mb-2"><strong>IFSC Code:</strong> <span id="ifsc_code">N/A</span></div>
+                <div class="mb-2"><strong>Account Holder:</strong> <span id="account_holder_name">N/A</span></div>
+
+                <div id="bank_document_wrap" class="mt-3" style="display:none;">
+                    <label>Document</label>
+                    <div class="text-center">
+                        <img id="bank_document" src="" class="img-fluid" alt="bank document" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openBankModal(userId) {
+        fetch('/admin/customers/bank/' + userId)
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (data) {
+                if (!data || !data.status) {
+                    alert(data.message || 'No bank details found');
+                    return;
+                }
+
+                var bank = data.bank;
+                document.getElementById('bank_name').innerText = bank.bank_name || 'N/A';
+                document.getElementById('account_number').innerText = bank.account_number || 'N/A';
+                document.getElementById('ifsc_code').innerText = bank.ifsc_code || 'N/A';
+                document.getElementById('account_holder_name').innerText = bank.account_holder_name || 'N/A';
+
+                if (bank.document) {
+                    // Ensure correct asset path
+                    var docUrl = bank.document.startsWith('http') ? bank.document : ('/' + bank.document).replace(/\/\\+/g, '/');
+                    document.getElementById('bank_document').src = docUrl;
+                    document.getElementById('bank_document_wrap').style.display = 'block';
+                } else {
+                    document.getElementById('bank_document_wrap').style.display = 'none';
+                }
+
+                var myModal = new bootstrap.Modal(document.getElementById('bankModal'));
+                myModal.show();
+            })
+            .catch(function (err) {
+                console.error(err);
+                alert('Failed to load bank details');
+            });
+    }
 </script>
 
 

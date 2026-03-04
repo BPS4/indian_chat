@@ -24,7 +24,8 @@ class AccountController extends Controller
             'account_number' => 'required|string|max:255',
             'ifsc_code' => 'required|string|max:255',
             'account_holder_name' => 'required|string|max:255',
-            'document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            // max is in kilobytes; 5120 KB = 5 MB
+            'document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         $bankAccount = BankAccount::firstOrNew([

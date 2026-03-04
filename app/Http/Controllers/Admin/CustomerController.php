@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\BankAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -173,5 +174,32 @@ class CustomerController extends Controller
             'status' => true,
             'message' => 'KYC status updated successfully'
         ]);
+    }
+
+    /**
+     * Return bank account details for a given user id (AJAX JSON)
+     */
+    public function bankDetails($id)
+    {
+        try {
+            $bank = BankAccount::where('user_id', $id)->first();
+
+            if (!$bank) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No bank details found for this user.'
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'bank' => $bank
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
